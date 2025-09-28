@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Component Testing - Tourism Safety Tracker</title>
+    <link rel="stylesheet" href="src/css/main.css">
+    <style>
+        .test-section {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            background: white;
+        }
+        
+        .test-section h3 {
+            margin-top: 0;
+            color: #1e293b;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 0.5rem;
+        }
+        
+        .test-controls {
+            display: flex;
+            gap: 1rem;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+        }
+        
+        .test-result {
+            margin: 1rem 0;
+            padding: 1rem;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.875rem;
+            white-space: pre-wrap;
+        }
+        
+        .result-success {
+            background: #f0fdf4;
+            border: 1px solid #22c55e;
+            color: #166534;
+        }
+        
+        .result-error {
+            background: #fef2f2;
+            border: 1px solid #ef4444;
+            color: #991b1b;
+        }
+        
+        .result-info {
+            background: #eff6ff;
+            border: 1px solid #3b82f6;
+            color: #1e40af;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: #f8fafc;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🧪 Component Testing</h1>
+        <p>Testing individual components with mock API data</p>
+    </div>
+
+    <div class="test-section">
+        <h3>🔐 Authentication Component Testing</h3>
+        <div class="test-controls">
+            <button id="test-register" class="btn btn-primary">Test Registration</button>
+            <button id="test-login" class="btn btn-primary">Test Login</button>
+            <button id="test-logout" class="btn btn-secondary">Test Logout</button>
+        </div>
+        <div id="auth-results" class="test-result result-info">Click buttons above to test authentication flows</div>
+    </div>
+
+    <div class="test-section">
+        <h3>🗺️ Trip Management Testing</h3>
+        <div class="test-controls">
+            <button id="test-get-trips" class="btn btn-primary">Get Trips</button>
+            <button id="test-create-trip" class="btn btn-primary">Create Trip</button>
+            <button id="test-trip-details" class="btn btn-secondary">Get Trip Details</button>
+        </div>
+        <div id="trip-results" class="test-result result-info">Click buttons above to test trip management</div>
+    </div>
+
+    <div class="test-section">
+        <h3>📍 Location Management Testing</h3>
+        <div class="test-controls">
+            <button id="test-get-locations" class="btn btn-primary">Get Locations</button>
+            <button id="test-add-location" class="btn btn-primary">Add Location</button>
+            <button id="test-location-update" class="btn btn-secondary">Submit Location Update</button>
+        </div>
+        <div id="location-results" class="test-result result-info">Click buttons above to test location features</div>
+    </div>
+
+    <div class="test-section">
+        <h3>🚨 Alert System Testing</h3>
+        <div class="test-controls">
+            <button id="test-get-alerts" class="btn btn-primary">Get Alerts</button>
+            <button id="test-respond-safe" class="btn btn-success">Respond Safe</button>
+            <button id="test-respond-help" class="btn btn-danger">Respond Help</button>
+        </div>
+        <div id="alert-results" class="test-result result-info">Click buttons above to test alert system</div>
+    </div>
+
+    <div class="test-section">
+        <h3>⚠️ Error Handling Testing</h3>
+        <div class="test-controls">
+            <button id="test-invalid-endpoint" class="btn btn-secondary">Invalid Endpoint</button>
+            <button id="test-invalid-login" class="btn btn-secondary">Invalid Login</button>
+            <button id="test-validation-error" class="btn btn-secondary">Validation Error</button>
+        </div>
+        <div id="error-results" class="test-result result-info">Click buttons above to test error scenarios</div>
+    </div>
+
+    <script type="module">
+        import apiClient from './src/api/client.js';
+
+        // Helper function to display results
+        function showResult(elementId, result, isError = false) {
+            const element = document.getElementById(elementId);
+            element.className = `test-result ${isError ? 'result-error' : 'result-success'}`;
+            element.textContent = typeof result === 'object' ? 
+                JSON.stringify(result, null, 2) : result;
+        }
+
+        function showError(elementId, error) {
+            const element = document.getElementById(elementId);
+            element.className = 'test-result result-error';
+            element.textContent = `Error: ${error.message}`;
+        }
+
+        // Authentication Tests
+        document.getElementById('test-register').addEventListener('click', async () => {
+            try {
+                const result = await apiClient.register({
+                    name: 'Test User',
+                    email: 'test@example.com',
+                    password: 'password123'
+                });
+                showResult('auth-results', result);
+            } catch (error) {
+                showError('auth-results', error);
+            }
+        });
+
+        document.getElementById('test-login').addEventListener('click', async () => {
+            try {
+                const result = await apiClient.login({
+                    email: 'test@example.com',
+                    password: 'password123'
+                });
+                showResult('auth-results', result);
+            } catch (error) {
+                showError('auth-results', error);
+            }
+        });
+
+        document.getElementById('test-logout').addEventListener('click', async () => {
+            try {
+                const result = await apiClient.logout();
+                showResult('auth-results', result);
+            } catch (error) {
+                showError('auth-results', error);
+            }
+        });
+
+        // Trip Management Tests
+        document.getElementById('test-get-trips').addEventListener('click', async () => {
+            try {
+                const result = await apiClient.getTrips();
+                showResult('trip-results', result);
+            } catch (error) {
+                showError('trip-results', error);
+            }
+        });
+
+        document.getElementById('test-create-trip').addEventListener('click', async () => {
+            try {
+                const result = await apiClient.createTrip({
+                    name: 'Test Trip',
+                    start_date: '2024-03-01',
+                    end_date: '2024-03-07',
+                    description: 'Test trip for validation'
+                });
+                showResult('trip-results', result);
+            } catch (error) {
+                showError('trip-results', error);
+            }
+        });
+
+        document.getElementById('test-trip-details').addEventListener('click', async () => {
+            try {
+                const result = await apiClient.getTrip(1);
+                showResult('trip-results', result);
+            } catch (error) {
+                showError('trip-results', error);
+            }
+        });
+
+        // Location Management Tests
+        document.getElementById('test-get-locations').addEventListener('click', async () => {
+            try {
+                const result = await apiClient.getTripLocations(1);
+                showResult('location-results', result);
+            } catch (error) {
+                showError('location-results', error);
+            }
+        });
+
+        document.getElementById('test-add-location').addEventListener('click', async () => {
+            try {
+                const result = await apiClient.addTripLocation(1, {
+                    name: 'Test Location',
+                    lat: 35.6762,
+                    lng: 139.6503,
+                    planned_time: '2024-03-01T10:00:00Z',
+                    type: 'attraction'
+                });
+                showResult('location-results', result);
+            } catch (error) {
+                showError('location-results', error);
+            }
+        });
+
+        document.getElementById('test-location-update').addEventListener('click', async () => {
+            try {
+                const result = await apiClient.submitLocationUpdate({
+                    lat: 35.6762,
+                    lng: 139.6503,
+                    timestamp: new Date().toISOString(),
+                    accuracy: 10
+                });
+                showResult('location-results', result);
+            } catch (error) {
+                showError('location-results', error);
+            }
+        });
+
+        // Alert System Tests
+        document.getElementById('test-get-alerts').addEventListener('click', async () => {
+            try {
+                const result = await apiClient.getAlerts();
+                showResult('alert-results', result);
+            } catch (error) {
+                showError('alert-results', error);
+            }
+        });
+
+        document.getElementById('test-respond-safe').addEventListener('click', async () => {
+            try {
+                const result = await apiClient.respondToAlert(1, 'safe');
+                showResult('alert-results', result);
+            } catch (error) {
+                showError('alert-results', error);
+            }
+        });
+
+        document.getElementById('test-respond-help').addEventListener('click', async () => {
+            try {
+                const result = await apiClient.respondToAlert(1, 'help');
+                showResult('alert-results', result);
+            } catch (error) {
+                showError('alert-results', error);
+            }
+        });
+
+        // Error Handling Tests
+        document.getElementById('test-invalid-endpoint').addEventListener('click', async () => {
+            try {
+                const result = await apiClient.request('/invalid-endpoint');
+                showResult('error-results', result);
+            } catch (error) {
+                showError('error-results', error);
+            }
+        });
+
+        document.getElementById('test-invalid-login').addEventListener('click', async () => {
+            try {
+                const result = await apiClient.login({
+                    email: 'invalid@example.com',
+                    password: 'wrongpassword'
+                });
+                showResult('error-results', result);
+            } catch (error) {
+                showError('error-results', error);
+            }
+        });
+
+        document.getElementById('test-validation-error').addEventListener('click', async () => {
+            try {
+                const result = await apiClient.createTrip({
+                    name: 'A', // Too short
+                    start_date: '2024-03-07',
+                    end_date: '2024-03-01' // End before start
+                });
+                showResult('error-results', result);
+            } catch (error) {
+                showError('error-results', error);
+            }
+        });
+
+        // Auto-run basic tests on page load
+        window.addEventListener('load', () => {
+            console.log('🧪 Component test page loaded');
+            console.log('Click the test buttons to validate mock API responses');
+        });
+    </script>
+</body>
+</html>

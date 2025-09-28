@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PWA Features Test - Tourism Safety Tracker</title>
+    <link rel="stylesheet" href="./src/styles/main.css">
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#2563eb">
+    <style>
+        .test-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+        
+        .test-section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+        }
+        
+        .test-section h3 {
+            margin-top: 0;
+            color: #1e293b;
+        }
+        
+        .test-result {
+            padding: 0.75rem;
+            border-radius: 6px;
+            margin: 0.5rem 0;
+            font-family: monospace;
+        }
+        
+        .test-success {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+        
+        .test-error {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+        
+        .test-info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+        }
+        
+        .test-button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 0.25rem;
+        }
+        
+        .test-button:hover {
+            background: #1d4ed8;
+        }
+        
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .status-card {
+            padding: 1rem;
+            background: #f9fafb;
+            border-radius: 6px;
+            text-align: center;
+        }
+        
+        .status-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 0.5rem 0;
+        }
+        
+        .status-online { color: #10b981; }
+        .status-offline { color: #f59e0b; }
+        .status-error { color: #ef4444; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🛡️ PWA Features Test</h1>
+        <p>This page tests the Progressive Web App features of the Tourism Safety Tracker.</p>
+        
+        <!-- Service Worker Test -->
+        <div class="test-section">
+            <h3>📦 Service Worker</h3>
+            <div id="sw-status" class="test-result test-info">Checking service worker...</div>
+            <button class="test-button" onclick="testServiceWorker()">Test Service Worker</button>
+            <button class="test-button" onclick="updateServiceWorker()">Update Service Worker</button>
+        </div>
+        
+        <!-- Offline Status Test -->
+        <div class="test-section">
+            <h3>📡 Offline Status</h3>
+            <div class="status-grid">
+                <div class="status-card">
+                    <div>Connection Status</div>
+                    <div id="connection-status" class="status-value status-online">Online</div>
+                </div>
+                <div class="status-card">
+                    <div>Cache Status</div>
+                    <div id="cache-status" class="status-value">Loading...</div>
+                </div>
+                <div class="status-card">
+                    <div>Offline Queue</div>
+                    <div id="queue-status" class="status-value">0</div>
+                </div>
+            </div>
+            <button class="test-button" onclick="simulateOffline()">Simulate Offline</button>
+            <button class="test-button" onclick="testOfflineSync()">Test Offline Sync</button>
+        </div>
+        
+        <!-- Installation Test -->
+        <div class="test-section">
+            <h3>📱 App Installation</h3>
+            <div id="install-status" class="test-result test-info">Checking installation status...</div>
+            <button class="test-button" onclick="testInstallPrompt()">Test Install Prompt</button>
+            <button class="test-button" onclick="checkInstallStatus()">Check Install Status</button>
+        </div>
+        
+        <!-- Cache Test -->
+        <div class="test-section">
+            <h3>💾 Cache Management</h3>
+            <div id="cache-info" class="test-result test-info">Loading cache information...</div>
+            <button class="test-button" onclick="testCacheStorage()">Test Cache Storage</button>
+            <button class="test-button" onclick="clearAllCaches()">Clear All Caches</button>
+        </div>
+        
+        <!-- IndexedDB Test -->
+        <div class="test-section">
+            <h3>🗄️ Offline Database</h3>
+            <div id="db-status" class="test-result test-info">Checking database...</div>
+            <button class="test-button" onclick="testIndexedDB()">Test IndexedDB</button>
+            <button class="test-button" onclick="clearOfflineDB()">Clear Offline DB</button>
+        </div>
+        
+        <!-- Background Sync Test -->
+        <div class="test-section">
+            <h3>🔄 Background Sync</h3>
+            <div id="sync-status" class="test-result test-info">Background sync not tested</div>
+            <button class="test-button" onclick="testBackgroundSync()">Test Background Sync</button>
+            <button class="test-button" onclick="forceSyncNow()">Force Sync Now</button>
+        </div>
+        
+        <!-- Push Notifications Test -->
+        <div class="test-section">
+            <h3>🔔 Push Notifications</h3>
+            <div id="notification-status" class="test-result test-info">Checking notification permission...</div>
+            <button class="test-button" onclick="requestNotificationPermission()">Request Permission</button>
+            <button class="test-button" onclick="testLocalNotification()">Test Local Notification</button>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import PWA components for testing
+        import OfflineStatusComponent from './src/components/offline-status.js';
+        import PWAInstallComponent from './src/components/pwa-install.js';
+        import offlineSyncService from './src/services/offline-sync.js';
+
+        // Initialize components
+        const offlineStatus = new OfflineStatusComponent();
+        const pwaInstall = new PWAInstallComponent();
+        
+        // Make components globally available for testing
+        window.offlineStatus = offlineStatus;
+        window.pwaInstall = pwaInstall;
+        window.offlineSyncService = offlineSyncService;
+
+        // Test functions
+        window.testServiceWorker = async function() {
+            const statusDiv = document.getElementById('sw-status');
+            
+            if ('serviceWorker' in navigator) {
+                try {
+                    const registration = await navigator.serviceWorker.getRegistration();
+                    if (registration) {
+                        statusDiv.className = 'test-result test-success';
+                        statusDiv.textContent = `✅ Service Worker registered: ${registration.scope}`;
+                    } else {
+                        // Try to register
+                        const newRegistration = await navigator.serviceWorker.register('/sw.js');
+                        statusDiv.className = 'test-result test-success';
+                        statusDiv.textContent = `✅ Service Worker registered: ${newRegistration.scope}`;
+                    }
+                } catch (error) {
+                    statusDiv.className = 'test-result test-error';
+                    statusDiv.textContent = `❌ Service Worker error: ${error.message}`;
+                }
+            } else {
+                statusDiv.className = 'test-result test-error';
+                statusDiv.textContent = '❌ Service Worker not supported';
+            }
+        };
+
+        window.updateServiceWorker = async function() {
+            const statusDiv = document.getElementById('sw-status');
+            
+            try {
+                const registration = await navigator.serviceWorker.getRegistration();
+                if (registration) {
+                    await registration.update();
+                    statusDiv.className = 'test-result test-success';
+                    statusDiv.textContent = '✅ Service Worker update triggered';
+                } else {
+                    statusDiv.className = 'test-result test-error';
+                    statusDiv.textContent = '❌ No Service Worker to update';
+                }
+            } catch (error) {
+                statusDiv.className = 'test-result test-error';
+                statusDiv.textContent = `❌ Update failed: ${error.message}`;
+            }
+        };
+
+        window.simulateOffline = function() {
+            // Simulate offline mode
+            Object.defineProperty(navigator, 'onLine', {
+                writable: true,
+                value: false
+            });
+            
+            window.dispatchEvent(new Event('offline'));
+            updateConnectionStatus();
+            
+            setTimeout(() => {
+                Object.defineProperty(navigator, 'onLine', {
+                    writable: true,
+                    value: true
+                });
+                window.dispatchEvent(new Event('online'));
+                updateConnectionStatus();
+            }, 5000);
+        };
+
+        window.testOfflineSync = async function() {
+            try {
+                // Queue a test request
+                await offlineSyncService.queueOfflineRequest(
+                    'POST',
+                    '/api/test',
+                    { test: 'offline sync' },
+                    { 'Content-Type': 'application/json' }
+                );
+                
+                updateQueueStatus();
+                
+                const statusDiv = document.getElementById('sync-status');
+                statusDiv.className = 'test-result test-success';
+                statusDiv.textContent = '✅ Test request queued for offline sync';
+            } catch (error) {
+                const statusDiv = document.getElementById('sync-status');
+                statusDiv.className = 'test-result test-error';
+                statusDiv.textContent = `❌ Offline sync test failed: ${error.message}`;
+            }
+        };
+
+        window.testInstallPrompt = function() {
+            const status = pwaInstall.getInstallStatus();
+            const statusDiv = document.getElementById('install-status');
+            
+            if (status.canInstall) {
+                pwaInstall.triggerInstallPrompt();
+                statusDiv.className = 'test-result test-success';
+                statusDiv.textContent = '✅ Install prompt triggered';
+            } else if (status.isInstalled) {
+                statusDiv.className = 'test-result test-info';
+                statusDiv.textContent = '📱 App is already installed';
+            } else if (status.isIOSSafari) {
+                pwaInstall.triggerInstallPrompt();
+                statusDiv.className = 'test-result test-success';
+                statusDiv.textContent = '✅ iOS install instructions shown';
+            } else {
+                statusDiv.className = 'test-result test-error';
+                statusDiv.textContent = '❌ Install prompt not available';
+            }
+        };
+
+        window.checkInstallStatus = function() {
+            const status = pwaInstall.getInstallStatus();
+            const statusDiv = document.getElementById('install-status');
+            
+            let message = '';
+            if (status.isInstalled) {
+                message = '✅ App is installed';
+            } else if (status.canInstall) {
+                message = '📱 App can be installed';
+            } else if (status.isIOSSafari) {
+                message = '🍎 iOS Safari - manual install available';
+            } else {
+                message = '❌ Installation not available';
+            }
+            
+            statusDiv.className = 'test-result test-info';
+            statusDiv.textContent = message;
+        };
+
+        window.testCacheStorage = async function() {
+            const statusDiv = document.getElementById('cache-info');
+            
+            try {
+                const cacheNames = await caches.keys();
+                const cacheInfo = [];
+                
+                for (const cacheName of cacheNames) {
+                    const cache = await caches.open(cacheName);
+                    const keys = await cache.keys();
+                    cacheInfo.push(`${cacheName}: ${keys.length} items`);
+                }
+                
+                statusDiv.className = 'test-result test-success';
+                statusDiv.textContent = `✅ Caches: ${cacheInfo.join(', ')}`;
+                
+                updateCacheStatus();
+            } catch (error) {
+                statusDiv.className = 'test-result test-error';
+                statusDiv.textContent = `❌ Cache test failed: ${error.message}`;
+            }
+        };
+
+        window.clearAllCaches = async function() {
+            const statusDiv = document.getElementById('cache-info');
+            
+            try {
+                const cacheNames = await caches.keys();
+                await Promise.all(cacheNames.map(name => caches.delete(name)));
+                
+                statusDiv.className = 'test-result test-success';
+                statusDiv.textContent = `✅ Cleared ${cacheNames.length} caches`;
+                
+                updateCacheStatus();
+            } catch (error) {
+                statusDiv.className = 'test-result test-error';
+                statusDiv.textContent = `❌ Cache clear failed: ${error.message}`;
+            }
+        };
+
+        window.testIndexedDB = async function() {
+            const statusDiv = document.getElementById('db-status');
+            
+            try {
+                // Test database operations
+                await offlineSyncService.cacheResponse('test-key', { test: 'data' });
+                const cachedData = await offlineSyncService.getCachedResponse('test-key');
+                
+                if (cachedData && cachedData.test === 'data') {
+                    statusDiv.className = 'test-result test-success';
+                    statusDiv.textContent = '✅ IndexedDB working correctly';
+                } else {
+                    statusDiv.className = 'test-result test-error';
+                    statusDiv.textContent = '❌ IndexedDB data mismatch';
+                }
+            } catch (error) {
+                statusDiv.className = 'test-result test-error';
+                statusDiv.textContent = `❌ IndexedDB test failed: ${error.message}`;
+            }
+        };
+
+        window.clearOfflineDB = async function() {
+            const statusDiv = document.getElementById('db-status');
+            
+            try {
+                if (offlineSyncService.db) {
+                    offlineSyncService.db.close();
+                }
+                
+                await new Promise((resolve, reject) => {
+                    const deleteReq = indexedDB.deleteDatabase('tourism-safety-offline');
+                    deleteReq.onsuccess = () => resolve();
+                    deleteReq.onerror = () => reject(deleteReq.error);
+                });
+                
+                statusDiv.className = 'test-result test-success';
+                statusDiv.textContent = '✅ Offline database cleared';
+            } catch (error) {
+                statusDiv.className = 'test-result test-error';
+                statusDiv.textContent = `❌ DB clear failed: ${error.message}`;
+            }
+        };
+
+        window.testBackgroundSync = function() {
+            const statusDiv = document.getElementById('sync-status');
+            
+            if ('serviceWorker' in navigator && 'sync' in window.ServiceWorkerRegistration.prototype) {
+                statusDiv.className = 'test-result test-success';
+                statusDiv.textContent = '✅ Background Sync supported';
+            } else {
+                statusDiv.className = 'test-result test-error';
+                statusDiv.textContent = '❌ Background Sync not supported';
+            }
+        };
+
+        window.forceSyncNow = async function() {
+            const statusDiv = document.getElementById('sync-status');
+            
+            try {
+                await offlineSyncService.forceSync();
+                statusDiv.className = 'test-result test-success';
+                statusDiv.textContent = '✅ Force sync completed';
+                updateQueueStatus();
+            } catch (error) {
+                statusDiv.className = 'test-result test-error';
+                statusDiv.textContent = `❌ Force sync failed: ${error.message}`;
+            }
+        };
+
+        window.requestNotificationPermission = async function() {
+            const statusDiv = document.getElementById('notification-status');
+            
+            if ('Notification' in window) {
+                const permission = await Notification.requestPermission();
+                statusDiv.className = 'test-result test-info';
+                statusDiv.textContent = `📋 Notification permission: ${permission}`;
+            } else {
+                statusDiv.className = 'test-result test-error';
+                statusDiv.textContent = '❌ Notifications not supported';
+            }
+        };
+
+        window.testLocalNotification = function() {
+            const statusDiv = document.getElementById('notification-status');
+            
+            if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification('PWA Test', {
+                    body: 'This is a test notification from the Tourism Safety Tracker PWA',
+                    icon: '/src/assets/icon-192.png',
+                    tag: 'pwa-test'
+                });
+                
+                statusDiv.className = 'test-result test-success';
+                statusDiv.textContent = '✅ Test notification sent';
+            } else {
+                statusDiv.className = 'test-result test-error';
+                statusDiv.textContent = '❌ Notification permission required';
+            }
+        };
+
+        // Helper functions
+        function updateConnectionStatus() {
+            const statusEl = document.getElementById('connection-status');
+            if (navigator.onLine) {
+                statusEl.textContent = 'Online';
+                statusEl.className = 'status-value status-online';
+            } else {
+                statusEl.textContent = 'Offline';
+                statusEl.className = 'status-value status-offline';
+            }
+        }
+
+        async function updateCacheStatus() {
+            const statusEl = document.getElementById('cache-status');
+            try {
+                const cacheNames = await caches.keys();
+                statusEl.textContent = `${cacheNames.length} caches`;
+                statusEl.className = 'status-value status-online';
+            } catch (error) {
+                statusEl.textContent = 'Error';
+                statusEl.className = 'status-value status-error';
+            }
+        }
+
+        async function updateQueueStatus() {
+            const statusEl = document.getElementById('queue-status');
+            try {
+                const requests = await offlineSyncService.getOfflineRequests();
+                statusEl.textContent = requests.length;
+                statusEl.className = requests.length > 0 ? 'status-value status-offline' : 'status-value status-online';
+            } catch (error) {
+                statusEl.textContent = 'Error';
+                statusEl.className = 'status-value status-error';
+            }
+        }
+
+        // Initialize status displays
+        updateConnectionStatus();
+        updateCacheStatus();
+        updateQueueStatus();
+
+        // Listen for online/offline events
+        window.addEventListener('online', updateConnectionStatus);
+        window.addEventListener('offline', updateConnectionStatus);
+
+        // Auto-run initial tests
+        setTimeout(() => {
+            testServiceWorker();
+            checkInstallStatus();
+            
+            const notificationStatusDiv = document.getElementById('notification-status');
+            if ('Notification' in window) {
+                notificationStatusDiv.className = 'test-result test-info';
+                notificationStatusDiv.textContent = `📋 Notification permission: ${Notification.permission}`;
+            } else {
+                notificationStatusDiv.className = 'test-result test-error';
+                notificationStatusDiv.textContent = '❌ Notifications not supported';
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

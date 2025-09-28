@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tourism Safety Tracker</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="./src/styles/main.css">
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#2563eb">
+    <!-- PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Safety Tracker">
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <div id="app">
+        <!-- Loading spinner -->
+        <div id="loading" class="loading-container">
+            <div class="spinner"></div>
+            <p>Loading your safety companion...</p>
+        </div>
+        
+        <!-- Main app container -->
+        <div id="main-app" style="display: none;">
+            <!-- Navigation -->
+            <nav id="navbar" class="navbar" role="navigation" aria-label="Main navigation">
+                <div class="nav-brand">
+                    <h1>🛡️ Tourism Safety Tracker</h1>
+                </div>
+                <div class="nav-menu" role="menubar">
+                    <button id="nav-trips" class="nav-btn active" role="menuitem" aria-current="page">My Trips</button>
+                    <button id="nav-alerts" class="nav-btn" role="menuitem">Safety Alerts</button>
+                    <button id="nav-profile" class="nav-btn" role="menuitem">Profile</button>
+                    <button id="logout-btn" class="nav-btn logout" role="menuitem">Sign Out</button>
+                </div>
+            </nav>
+
+            <!-- Main content area -->
+            <main id="content" class="main-content" tabindex="-1">
+                <!-- Content will be dynamically loaded here -->
+            </main>
+        </div>
+
+        <!-- Authentication screens -->
+        <div id="auth-container" class="auth-container">
+            <!-- Login Form -->
+            <div id="login-form" class="auth-form">
+                <div class="auth-header">
+                    <h1>🛡️ Tourism Safety Tracker</h1>
+                    <p>Your trusted companion for safe and secure travels worldwide</p>
+                </div>
+                <form id="login" autocomplete="on" aria-label="Sign in form">
+                    <div class="form-group">
+                        <label for="login-email">Email Address</label>
+                        <input 
+                            type="email" 
+                            id="login-email" 
+                            name="email"
+                            placeholder="Enter your email address"
+                            autocomplete="email"
+                            aria-describedby="login-email-help"
+                            required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Password</label>
+                        <input 
+                            type="password" 
+                            id="login-password" 
+                            name="password"
+                            placeholder="Enter your password"
+                            autocomplete="current-password"
+                            aria-describedby="login-password-help"
+                            required>
+                    </div>
+                    <button type="submit" class="btn-primary" aria-describedby="demo-notice">
+                        <span>Sign In</span>
+                    </button>
+                    <p class="auth-switch">
+                        New to Tourism Safety Tracker? 
+                        <a href="#" id="show-register">Create your free account</a>
+                    </p>
+                </form>
+                <div class="auth-footer">
+                    <p class="demo-notice">
+                        <strong>Demo Mode:</strong> Use any email and password to explore the app features
+                    </p>
+                </div>
+            </div>
+
+            <!-- Register Form -->
+            <div id="register-form" class="auth-form" style="display: none;">
+                <div class="auth-header">
+                    <h1>🛡️ Join Tourism Safety Tracker</h1>
+                    <p>Create your account and explore the world with confidence and peace of mind</p>
+                </div>
+                <form id="register" autocomplete="on" aria-label="Create account form">
+                    <div class="form-group">
+                        <label for="register-name">Full Name</label>
+                        <input 
+                            type="text" 
+                            id="register-name" 
+                            name="name"
+                            placeholder="Enter your full name"
+                            autocomplete="name"
+                            aria-describedby="register-name-help"
+                            required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-email">Email Address</label>
+                        <input 
+                            type="email" 
+                            id="register-email" 
+                            name="email"
+                            placeholder="Enter your email address"
+                            autocomplete="email"
+                            aria-describedby="register-email-help"
+                            required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password">Password</label>
+                        <input 
+                            type="password" 
+                            id="register-password" 
+                            name="password"
+                            placeholder="Create a secure password (min. 6 characters)"
+                            autocomplete="new-password"
+                            aria-describedby="register-password-help"
+                            minlength="6"
+                            required>
+                    </div>
+                    <button type="submit" class="btn-primary" aria-describedby="demo-notice">
+                        <span>Create Account</span>
+                    </button>
+                    <p class="auth-switch">
+                        Already have an account? 
+                        <a href="#" id="show-login">Sign in here</a>
+                    </p>
+                </form>
+                <div class="auth-footer">
+                    <p class="demo-notice">
+                        <strong>Demo Mode:</strong> Registration creates a test account for demonstration purposes
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script type="module" src="./src/main.js"></script>
+</body>
+</html>

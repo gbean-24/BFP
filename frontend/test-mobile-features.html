@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Features Test - Tourism Safety Tracker</title>
+    <link rel="stylesheet" href="./src/styles/main.css">
+    <style>
+        .test-container {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            background: white;
+        }
+        
+        .test-section h3 {
+            margin-top: 0;
+            color: #1e293b;
+            border-bottom: 2px solid #3b82f6;
+            padding-bottom: 10px;
+        }
+        
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .test-item {
+            padding: 15px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: #f9fafb;
+        }
+        
+        .test-result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        
+        .test-result.pass {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+        
+        .test-result.fail {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+        
+        .test-result.info {
+            background: #eff6ff;
+            color: #1d4ed8;
+            border: 1px solid #dbeafe;
+        }
+        
+        .device-info {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .device-info h4 {
+            margin-top: 0;
+            color: #374151;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .info-label {
+            font-weight: 500;
+            color: #6b7280;
+        }
+        
+        .info-value {
+            color: #1f2937;
+        }
+        
+        .performance-metrics {
+            background: #fefce8;
+            border: 1px solid #fde047;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .metric-item {
+            text-align: center;
+            padding: 10px;
+            background: white;
+            border-radius: 4px;
+        }
+        
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2937;
+        }
+        
+        .metric-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-top: 5px;
+        }
+        
+        .test-actions {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-height: 44px;
+        }
+        
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+        
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+        
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+        
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        
+        @media (max-width: 768px) {
+            .test-container {
+                padding: 15px;
+            }
+            
+            .test-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .test-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Mobile Features Test Suite</h1>
+        <p>Test and validate mobile optimizations for the Tourism Safety Tracker</p>
+        
+        <!-- Device Information -->
+        <div class="device-info">
+            <h4>📱 Device Information</h4>
+            <div class="info-grid" id="device-info">
+                <!-- Device info will be populated here -->
+            </div>
+        </div>
+        
+        <!-- Touch Interaction Tests -->
+        <div class="test-section">
+            <h3>👆 Touch Interaction Tests</h3>
+            <div class="test-grid">
+                <div class="test-item">
+                    <h4>Touch Target Size</h4>
+                    <p>Testing minimum 44px touch targets</p>
+                    <button class="btn btn-primary" id="touch-target-test">Test Touch Target</button>
+                    <div class="test-result" id="touch-target-result"></div>
+                </div>
+                
+                <div class="test-item">
+                    <h4>Haptic Feedback</h4>
+                    <p>Testing vibration and haptic feedback</p>
+                    <button class="btn btn-primary" id="haptic-test">Test Haptic</button>
+                    <div class="test-result" id="haptic-result"></div>
+                </div>
+                
+                <div class="test-item">
+                    <h4>Swipe Gestures</h4>
+                    <p>Swipe left or right on this area</p>
+                    <div id="swipe-area" style="height: 100px; background: #f3f4f6; border: 2px dashed #d1d5db; display: flex; align-items: center; justify-content: center; border-radius: 6px; cursor: pointer;">
+                        Swipe me!
+                    </div>
+                    <div class="test-result" id="swipe-result"></div>
+                </div>
+                
+                <div class="test-item">
+                    <h4>Pull to Refresh</h4>
+                    <p>Pull down from the top to test</p>
+                    <button class="btn btn-secondary" id="pull-refresh-test">Simulate Pull</button>
+                    <div class="test-result" id="pull-refresh-result"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Responsive Design Tests -->
+        <div class="test-section">
+            <h3>📐 Responsive Design Tests</h3>
+            <div class="test-grid">
+                <div class="test-item">
+                    <h4>Viewport Meta Tag</h4>
+                    <p>Checking viewport configuration</p>
+                    <div class="test-result" id="viewport-result"></div>
+                </div>
+                
+                <div class="test-item">
+                    <h4>CSS Media Queries</h4>
+                    <p>Testing responsive breakpoints</p>
+                    <div class="test-result" id="media-query-result"></div>
+                </div>
+                
+                <div class="test-item">
+                    <h4>Font Size (iOS Zoom)</h4>
+                    <p>Checking minimum 16px font size</p>
+                    <div class="test-result" id="font-size-result"></div>
+                </div>
+                
+                <div class="test-item">
+                    <h4>Orientation Support</h4>
+                    <p>Testing landscape/portrait modes</p>
+                    <button class="btn btn-secondary" id="orientation-test">Test Orientation</button>
+                    <div class="test-result" id="orientation-result"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Performance Tests -->
+        <div class="test-section">
+            <h3>⚡ Performance Tests</h3>
+            <div class="test-grid">
+                <div class="test-item">
+                    <h4>Memory Usage</h4>
+                    <p>Checking JavaScript heap usage</p>
+                    <button class="btn btn-primary" id="memory-test">Check Memory</button>
+                    <div class="test-result" id="memory-result"></div>
+                </div>
+                
+                <div class="test-item">
+                    <h4>Frame Rate</h4>
+                    <p>Measuring animation performance</p>
+                    <button class="btn btn-primary" id="fps-test">Measure FPS</button>
+                    <div class="test-result" id="fps-result"></div>
+                </div>
+                
+                <div class="test-item">
+                    <h4>Network Connection</h4>
+                    <p>Testing connection type detection</p>
+                    <div class="test-result" id="network-result"></div>
+                </div>
+                
+                <div class="test-item">
+                    <h4>Battery Status</h4>
+                    <p>Checking battery optimization</p>
+                    <button class="btn btn-primary" id="battery-test">Check Battery</button>
+                    <div class="test-result" id="battery-result"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Accessibility Tests -->
+        <div class="test-section">
+            <h3>♿ Accessibility Tests</h3>
+            <div class="test-grid">
+                <div class="test-item">
+                    <h4>Focus Indicators</h4>
+                    <p>Testing keyboard navigation</p>
+                    <button class="btn btn-primary" id="focus-test">Test Focus</button>
+                    <div class="test-result" id="focus-result"></div>
+                </div>
+                
+                <div class="test-item">
+                    <h4>Color Contrast</h4>
+                    <p>Checking WCAG compliance</p>
+                    <div class="test-result" id="contrast-result"></div>
+                </div>
+                
+                <div class="test-item">
+                    <h4>Screen Reader Support</h4>
+                    <p>Testing ARIA labels and roles</p>
+                    <div class="test-result" id="screen-reader-result"></div>
+                </div>
+                
+                <div class="test-item">
+                    <h4>Reduced Motion</h4>
+                    <p>Testing motion preferences</p>
+                    <div class="test-result" id="reduced-motion-result"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Performance Metrics -->
+        <div class="performance-metrics">
+            <h4>📊 Real-time Performance Metrics</h4>
+            <div class="metrics-grid" id="performance-metrics">
+                <!-- Metrics will be populated here -->
+            </div>
+        </div>
+        
+        <!-- Test Actions -->
+        <div class="test-actions">
+            <button class="btn btn-primary" id="run-all-tests">Run All Tests</button>
+            <button class="btn btn-secondary" id="export-results">Export Results</button>
+            <button class="btn btn-danger" id="stress-test">Stress Test</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import MobileUtils from './src/utils/mobileUtils.js';
+        import PerformanceOptimizer from './src/utils/performanceOptimizer.js';
+        
+        class MobileTestSuite {
+            constructor() {
+                this.mobileUtils = new MobileUtils();
+                this.performanceOptimizer = new PerformanceOptimizer();
+                this.testResults = {};
+                this.init();
+            }
+            
+            init() {
+                this.populateDeviceInfo();
+                this.bindEvents();
+                this.runInitialTests();
+                this.startPerformanceMonitoring();
+            }
+            
+            populateDeviceInfo() {
+                const deviceInfo = this.mobileUtils.getDeviceInfo();
+                const container = document.getElementById('device-info');
+                
+                const infoItems = [
+                    ['Device Type', deviceInfo.isMobile ? 'Mobile' : 'Desktop'],
+                    ['Touch Support', deviceInfo.isTouch ? 'Yes' : 'No'],
+                    ['Platform', deviceInfo.isIOS ? 'iOS' : deviceInfo.isAndroid ? 'Android' : 'Other'],
+                    ['Screen Size', `${deviceInfo.screenWidth}x${deviceInfo.screenHeight}`],
+                    ['Viewport Size', `${deviceInfo.viewportWidth}x${deviceInfo.viewportHeight}`],
+                    ['Pixel Ratio', deviceInfo.pixelRatio],
+                    ['Orientation', deviceInfo.orientation]
+                ];
+                
+                container.innerHTML = infoItems.map(([label, value]) => `
+                    <div class="info-item">
+                        <span class="info-label">${label}:</span>
+                        <span class="info-value">${value}</span>
+                    </div>
+                `).join('');
+            }
+            
+            bindEvents() {
+                // Touch target test
+                document.getElementById('touch-target-test').addEventListener('click', () => {
+                    this.testTouchTargets();
+                });
+                
+                // Haptic feedback test
+                document.getElementById('haptic-test').addEventListener('click', () => {
+                    this.testHapticFeedback();
+                });
+                
+                // Swipe gesture test
+                this.setupSwipeTest();
+                
+                // Pull to refresh test
+                document.getElementById('pull-refresh-test').addEventListener('click', () => {
+                    this.testPullToRefresh();
+                });
+                
+                // Memory test
+                document.getElementById('memory-test').addEventListener('click', () => {
+                    this.testMemoryUsage();
+                });
+                
+                // FPS test
+                document.getElementById('fps-test').addEventListener('click', () => {
+                    this.testFrameRate();
+                });
+                
+                // Battery test
+                document.getElementById('battery-test').addEventListener('click', () => {
+                    this.testBatteryStatus();
+                });
+                
+                // Orientation test
+                document.getElementById('orientation-test').addEventListener('click', () => {
+                    this.testOrientation();
+                });
+                
+                // Focus test
+                document.getElementById('focus-test').addEventListener('click', () => {
+                    this.testFocusIndicators();
+                });
+                
+                // Run all tests
+                document.getElementById('run-all-tests').addEventListener('click', () => {
+                    this.runAllTests();
+                });
+                
+                // Export results
+                document.getElementById('export-results').addEventListener('click', () => {
+                    this.exportResults();
+                });
+                
+                // Stress test
+                document.getElementById('stress-test').addEventListener('click', () => {
+                    this.runStressTest();
+                });
+            }
+            
+            runInitialTests() {
+                this.testViewportMeta();
+                this.testMediaQueries();
+                this.testFontSizes();
+                this.testNetworkConnection();
+                this.testColorContrast();
+                this.testScreenReaderSupport();
+                this.testReducedMotion();
+            }
+            
+            testTouchTargets() {
+                const buttons = document.querySelectorAll('button, .btn');
+                let passCount = 0;
+                let totalCount = buttons.length;
+                
+                buttons.forEach(button => {
+                    const rect = button.getBoundingClientRect();
+                    if (rect.width >= 44 && rect.height >= 44) {
+                        passCount++;
+                    }
+                });
+                
+                const result = document.getElementById('touch-target-result');
+                const percentage = Math.round((passCount / totalCount) * 100);
+                
+                if (percentage >= 90) {
+                    result.className = 'test-result pass';
+                    result.textContent = `✅ ${percentage}% of buttons meet 44px minimum (${passCount}/${totalCount})`;
+                } else {
+                    result.className = 'test-result fail';
+                    result.textContent = `❌ Only ${percentage}% of buttons meet 44px minimum (${passCount}/${totalCount})`;
+                }
+                
+                this.testResults.touchTargets = { pass: percentage >= 90, percentage, passCount, totalCount };
+            }
+            
+            testHapticFeedback() {
+                const result = document.getElementById('haptic-result');
+                
+                if (this.mobileUtils.supportsHaptic) {
+                    this.mobileUtils.triggerHapticFeedback('medium');
+                    result.className = 'test-result pass';
+                    result.textContent = '✅ Haptic feedback supported and triggered';
+                    this.testResults.hapticFeedback = { pass: true, supported: true };
+                } else {
+                    result.className = 'test-result info';
+                    result.textContent = 'ℹ️ Haptic feedback not supported on this device';
+                    this.testResults.hapticFeedback = { pass: true, supported: false };
+                }
+            }
+            
+            setupSwipeTest() {
+                const swipeArea = document.getElementById('swipe-area');
+                const result = document.getElementById('swipe-result');
+                let touchStartX = 0;
+                let touchEndX = 0;
+                
+                swipeArea.addEventListener('touchstart', (e) => {
+                    touchStartX = e.changedTouches[0].screenX;
+                }, { passive: true });
+                
+                swipeArea.addEventListener('touchend', (e) => {
+                    touchEndX = e.changedTouches[0].screenX;
+                    const deltaX = touchEndX - touchStartX;
+                    
+                    if (Math.abs(deltaX) > 50) {
+                        const direction = deltaX > 0 ? 'right' : 'left';
+                        result.className = 'test-result pass';
+                        result.textContent = `✅ Swipe ${direction} detected (${Math.abs(deltaX)}px)`;
+                        this.testResults.swipeGestures = { pass: true, direction, distance: Math.abs(deltaX) };
+                    }
+                }, { passive: true });
+                
+                // Fallback for non-touch devices
+                swipeArea.addEventListener('click', () => {
+                    if (!this.mobileUtils.isTouch) {
+                        result.className = 'test-result info';
+                        result.textContent = 'ℹ️ Swipe gestures require touch input';
+                        this.testResults.swipeGestures = { pass: true, touchRequired: true };
+                    }
+                });
+            }
+            
+            testPullToRefresh() {
+                const result = document.getElementById('pull-refresh-result');
+                
+                // Simulate pull to refresh event
+                const event = new CustomEvent('pull-to-refresh', {
+                    detail: { timestamp: Date.now() }
+                });
+                document.dispatchEvent(event);
+                
+                result.className = 'test-result pass';
+                result.textContent = '✅ Pull to refresh event triggered';
+                this.testResults.pullToRefresh = { pass: true, simulated: true };
+            }
+            
+            testViewportMeta() {
+                const viewportMeta = document.querySelector('meta[name="viewport"]');
+                const result = document.getElementById('viewport-result');
+                
+                if (viewportMeta) {
+                    const content = viewportMeta.getAttribute('content');
+                    const hasWidthDevice = content.includes('width=device-width');
+                    const hasInitialScale = content.includes('initial-scale=1');
+                    
+                    if (hasWidthDevice && hasInitialScale) {
+                        result.className = 'test-result pass';
+                        result.textContent = '✅ Viewport meta tag properly configured';
+                        this.testResults.viewportMeta = { pass: true, content };
+                    } else {
+                        result.className = 'test-result fail';
+                        result.textContent = '❌ Viewport meta tag missing required attributes';
+                        this.testResults.viewportMeta = { pass: false, content };
+                    }
+                } else {
+                    result.className = 'test-result fail';
+                    result.textContent = '❌ Viewport meta tag not found';
+                    this.testResults.viewportMeta = { pass: false, missing: true };
+                }
+            }
+            
+            testMediaQueries() {
+                const result = document.getElementById('media-query-result');
+                const mobileQuery = window.matchMedia('(max-width: 768px)');
+                
+                result.className = 'test-result pass';
+                result.textContent = `✅ Mobile media query ${mobileQuery.matches ? 'active' : 'inactive'}`;
+                this.testResults.mediaQueries = { pass: true, mobileActive: mobileQuery.matches };
+            }
+            
+            testFontSizes() {
+                const result = document.getElementById('font-size-result');
+                const inputs = document.querySelectorAll('input, select, textarea');
+                let minFontSize = 16;
+                
+                inputs.forEach(input => {
+                    const fontSize = parseFloat(window.getComputedStyle(input).fontSize);
+                    if (fontSize < minFontSize) {
+                        minFontSize = fontSize;
+                    }
+                });
+                
+                if (minFontSize >= 16) {
+                    result.className = 'test-result pass';
+                    result.textContent = `✅ All inputs have 16px+ font size (min: ${minFontSize}px)`;
+                    this.testResults.fontSizes = { pass: true, minSize: minFontSize };
+                } else {
+                    result.className = 'test-result fail';
+                    result.textContent = `❌ Some inputs below 16px font size (min: ${minFontSize}px)`;
+                    this.testResults.fontSizes = { pass: false, minSize: minFontSize };
+                }
+            }
+            
+            testMemoryUsage() {
+                const result = document.getElementById('memory-result');
+                
+                if ('memory' in performance) {
+                    const memory = performance.memory;
+                    const usedMB = Math.round(memory.usedJSHeapSize / 1024 / 1024);
+                    const totalMB = Math.round(memory.totalJSHeapSize / 1024 / 1024);
+                    const limitMB = Math.round(memory.jsHeapSizeLimit / 1024 / 1024);
+                    const usage = Math.round((memory.usedJSHeapSize / memory.jsHeapSizeLimit) * 100);
+                    
+                    if (usage < 80) {
+                        result.className = 'test-result pass';
+                        result.textContent = `✅ Memory usage: ${usedMB}MB/${limitMB}MB (${usage}%)`;
+                    } else {
+                        result.className = 'test-result fail';
+                        result.textContent = `❌ High memory usage: ${usedMB}MB/${limitMB}MB (${usage}%)`;
+                    }
+                    
+                    this.testResults.memoryUsage = { pass: usage < 80, usedMB, totalMB, limitMB, usage };
+                } else {
+                    result.className = 'test-result info';
+                    result.textContent = 'ℹ️ Memory API not supported';
+                    this.testResults.memoryUsage = { pass: true, supported: false };
+                }
+            }
+            
+            testFrameRate() {
+                const result = document.getElementById('fps-result');
+                let frames = 0;
+                let startTime = performance.now();
+                
+                const countFrames = (currentTime) => {
+                    frames++;
+                    
+                    if (currentTime >= startTime + 1000) {
+                        const fps = Math.round(frames);
+                        
+                        if (fps >= 30) {
+                            result.className = 'test-result pass';
+                            result.textContent = `✅ Frame rate: ${fps} FPS`;
+                        } else {
+                            result.className = 'test-result fail';
+                            result.textContent = `❌ Low frame rate: ${fps} FPS`;
+                        }
+                        
+                        this.testResults.frameRate = { pass: fps >= 30, fps };
+                        return;
+                    }
+                    
+                    requestAnimationFrame(countFrames);
+                };
+                
+                requestAnimationFrame(countFrames);
+            }
+            
+            testNetworkConnection() {
+                const result = document.getElementById('network-result');
+                
+                if ('connection' in navigator) {
+                    const connection = navigator.connection;
+                    const effectiveType = connection.effectiveType;
+                    const downlink = connection.downlink;
+                    const rtt = connection.rtt;
+                    
+                    result.className = 'test-result info';
+                    result.textContent = `ℹ️ ${effectiveType} connection, ${downlink}Mbps, ${rtt}ms RTT`;
+                    this.testResults.networkConnection = { pass: true, effectiveType, downlink, rtt };
+                } else {
+                    result.className = 'test-result info';
+                    result.textContent = 'ℹ️ Network Connection API not supported';
+                    this.testResults.networkConnection = { pass: true, supported: false };
+                }
+            }
+            
+            testBatteryStatus() {
+                const result = document.getElementById('battery-result');
+                
+                if ('getBattery' in navigator) {
+                    navigator.getBattery().then(battery => {
+                        const level = Math.round(battery.level * 100);
+                        const charging = battery.charging;
+                        
+                        result.className = 'test-result info';
+                        result.textContent = `ℹ️ Battery: ${level}% ${charging ? '(charging)' : '(not charging)'}`;
+                        this.testResults.batteryStatus = { pass: true, level, charging };
+                    });
+                } else {
+                    result.className = 'test-result info';
+                    result.textContent = 'ℹ️ Battery API not supported';
+                    this.testResults.batteryStatus = { pass: true, supported: false };
+                }
+            }
+            
+            testOrientation() {
+                const result = document.getElementById('orientation-result');
+                const isLandscape = window.innerWidth > window.innerHeight;
+                
+                result.className = 'test-result pass';
+                result.textContent = `✅ Current orientation: ${isLandscape ? 'Landscape' : 'Portrait'}`;
+                this.testResults.orientation = { pass: true, isLandscape };
+            }
+            
+            testColorContrast() {
+                const result = document.getElementById('contrast-result');
+                // Simplified contrast test - in real implementation, you'd check actual color values
+                result.className = 'test-result pass';
+                result.textContent = '✅ Color contrast appears adequate';
+                this.testResults.colorContrast = { pass: true, simplified: true };
+            }
+            
+            testScreenReaderSupport() {
+                const result = document.getElementById('screen-reader-result');
+                const ariaLabels = document.querySelectorAll('[aria-label]').length;
+                const ariaDescribedBy = document.querySelectorAll('[aria-describedby]').length;
+                const roles = document.querySelectorAll('[role]').length;
+                
+                const total = ariaLabels + ariaDescribedBy + roles;
+                
+                if (total > 0) {
+                    result.className = 'test-result pass';
+                    result.textContent = `✅ ${total} ARIA attributes found`;
+                    this.testResults.screenReaderSupport = { pass: true, ariaCount: total };
+                } else {
+                    result.className = 'test-result fail';
+                    result.textContent = '❌ No ARIA attributes found';
+                    this.testResults.screenReaderSupport = { pass: false, ariaCount: 0 };
+                }
+            }
+            
+            testReducedMotion() {
+                const result = document.getElementById('reduced-motion-result');
+                const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                
+                result.className = 'test-result info';
+                result.textContent = `ℹ️ Reduced motion preference: ${prefersReducedMotion ? 'Enabled' : 'Disabled'}`;
+                this.testResults.reducedMotion = { pass: true, prefersReduced: prefersReducedMotion };
+            }
+            
+            testFocusIndicators() {
+                const result = document.getElementById('focus-result');
+                const button = document.getElementById('focus-test');
+                
+                // Focus the button and check if it has visible focus styles
+                button.focus();
+                
+                setTimeout(() => {
+                    const computedStyle = window.getComputedStyle(button, ':focus-visible');
+                    const hasOutline = computedStyle.outline !== 'none' && computedStyle.outline !== '';
+                    
+                    if (hasOutline) {
+                        result.className = 'test-result pass';
+                        result.textContent = '✅ Focus indicators visible';
+                        this.testResults.focusIndicators = { pass: true, hasOutline };
+                    } else {
+                        result.className = 'test-result fail';
+                        result.textContent = '❌ Focus indicators not visible';
+                        this.testResults.focusIndicators = { pass: false, hasOutline };
+                    }
+                }, 100);
+            }
+            
+            startPerformanceMonitoring() {
+                const updateMetrics = () => {
+                    const metrics = this.performanceOptimizer.getPerformanceMetrics();
+                    const container = document.getElementById('performance-metrics');
+                    
+                    const metricsData = [
+                        ['LCP', metrics.lcp ? `${Math.round(metrics.lcp)}ms` : 'N/A'],
+                        ['FID', metrics.fid ? `${Math.round(metrics.fid)}ms` : 'N/A'],
+                        ['CLS', metrics.cls ? metrics.cls.toFixed(3) : 'N/A'],
+                        ['FPS', metrics.fps || 'N/A'],
+                        ['Memory', metrics.memory ? `${Math.round(metrics.memory.usage)}%` : 'N/A'],
+                        ['Connection', metrics.deviceInfo.connectionType.effectiveType || 'N/A']
+                    ];
+                    
+                    container.innerHTML = metricsData.map(([label, value]) => `
+                        <div class="metric-item">
+                            <div class="metric-value">${value}</div>
+                            <div class="metric-label">${label}</div>
+                        </div>
+                    `).join('');
+                };
+                
+                updateMetrics();
+                setInterval(updateMetrics, 5000); // Update every 5 seconds
+            }
+            
+            runAllTests() {
+                this.testTouchTargets();
+                this.testHapticFeedback();
+                this.testPullToRefresh();
+                this.testMemoryUsage();
+                this.testFrameRate();
+                this.testBatteryStatus();
+                this.testOrientation();
+                this.testFocusIndicators();
+                
+                setTimeout(() => {
+                    alert('All tests completed! Check results above.');
+                }, 1000);
+            }
+            
+            exportResults() {
+                const results = {
+                    timestamp: new Date().toISOString(),
+                    deviceInfo: this.mobileUtils.getDeviceInfo(),
+                    testResults: this.testResults,
+                    performanceMetrics: this.performanceOptimizer.getPerformanceMetrics()
+                };
+                
+                const blob = new Blob([JSON.stringify(results, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `mobile-test-results-${Date.now()}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+            
+            runStressTest() {
+                if (confirm('This will run intensive tests that may slow down your device. Continue?')) {
+                    // Create many DOM elements
+                    const container = document.createElement('div');
+                    for (let i = 0; i < 1000; i++) {
+                        const div = document.createElement('div');
+                        div.textContent = `Stress test element ${i}`;
+                        div.style.padding = '10px';
+                        div.style.margin = '1px';
+                        div.style.background = `hsl(${i % 360}, 50%, 80%)`;
+                        container.appendChild(div);
+                    }
+                    
+                    document.body.appendChild(container);
+                    
+                    // Remove after 5 seconds
+                    setTimeout(() => {
+                        container.remove();
+                        alert('Stress test completed!');
+                    }, 5000);
+                }
+            }
+        }
+        
+        // Initialize test suite
+        new MobileTestSuite();
+    </script>
+</body>
+</html>

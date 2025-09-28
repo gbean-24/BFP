@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map Integration Test - Tourism Safety Tracker</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="./src/styles/main.css">
+    <style>
+        body {
+            font-family: var(--font-family);
+            margin: 0;
+            padding: 2rem;
+            background: var(--gray-50);
+        }
+        
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .test-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .test-map {
+            height: 400px;
+            border-radius: 8px;
+            border: 1px solid var(--gray-300);
+            margin: 1rem 0;
+        }
+        
+        .test-controls {
+            display: flex;
+            gap: 1rem;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.15s;
+        }
+        
+        .btn-primary {
+            background: var(--primary-500);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-600);
+        }
+        
+        .btn-secondary {
+            background: var(--gray-200);
+            color: var(--gray-700);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--gray-300);
+        }
+        
+        .test-results {
+            background: var(--gray-50);
+            padding: 1rem;
+            border-radius: 6px;
+            margin-top: 1rem;
+            font-family: monospace;
+            font-size: 0.875rem;
+        }
+        
+        .success {
+            color: var(--success-600);
+        }
+        
+        .error {
+            color: var(--danger-600);
+        }
+        
+        .info {
+            color: var(--primary-600);
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🗺️ Map Integration Test Suite</h1>
+        <p>Testing enhanced Leaflet.js integration with location features</p>
+        
+        <!-- Basic Map Test -->
+        <div class="test-section">
+            <h2>1. Basic Map with Enhanced Markers</h2>
+            <div id="basic-map" class="test-map"></div>
+            <div class="test-controls">
+                <button class="btn btn-primary" onclick="testBasicMap()">Initialize Map</button>
+                <button class="btn btn-secondary" onclick="addTestMarkers()">Add Test Markers</button>
+                <button class="btn btn-secondary" onclick="testCurrentLocation()">Get Current Location</button>
+            </div>
+            <div id="basic-results" class="test-results"></div>
+        </div>
+        
+        <!-- Geocoding Test -->
+        <div class="test-section">
+            <h2>2. Geocoding & Location Search</h2>
+            <div class="test-controls">
+                <input type="text" id="search-input" placeholder="Search for a location..." style="flex: 1; padding: 0.5rem; border: 1px solid var(--gray-300); border-radius: 6px;">
+                <button class="btn btn-primary" onclick="testGeocode()">Search</button>
+                <button class="btn btn-secondary" onclick="testReverseGeocode()">Reverse Geocode Tokyo</button>
+            </div>
+            <div id="geocoding-results" class="test-results"></div>
+        </div>
+        
+        <!-- Route Visualization Test -->
+        <div class="test-section">
+            <h2>3. Route Visualization</h2>
+            <div id="route-map" class="test-map"></div>
+            <div class="test-controls">
+                <button class="btn btn-primary" onclick="testRouteVisualization()">Create Tokyo Route</button>
+                <button class="btn btn-secondary" onclick="testEuropeRoute()">Create Europe Route</button>
+                <button class="btn btn-secondary" onclick="clearRoutes()">Clear Routes</button>
+            </div>
+            <div id="route-results" class="test-results"></div>
+        </div>
+        
+        <!-- Location Search Modal Test -->
+        <div class="test-section">
+            <h2>4. Location Search Modal</h2>
+            <div class="test-controls">
+                <button class="btn btn-primary" onclick="testLocationSearchModal()">Open Location Search</button>
+            </div>
+            <div id="modal-results" class="test-results"></div>
+        </div>
+        
+        <!-- GPS Accuracy Test -->
+        <div class="test-section">
+            <h2>5. GPS Accuracy & Tracking</h2>
+            <div class="test-controls">
+                <button class="btn btn-primary" onclick="testGPSAccuracy()">Test GPS Accuracy</button>
+                <button class="btn btn-secondary" onclick="startLocationTracking()">Start Tracking</button>
+                <button class="btn btn-secondary" onclick="stopLocationTracking()">Stop Tracking</button>
+            </div>
+            <div id="gps-results" class="test-results"></div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script type="module">
+        import mapUtils from './src/utils/mapUtils.js';
+        import locationSearchComponent from './src/components/locationSearch.js';
+        
+        // Make utilities available globally for testing
+        window.mapUtils = mapUtils;
+        window.locationSearchComponent = locationSearchComponent;
+        
+        let basicMap = null;
+        let routeMap = null;
+        let trackingInterval = null;
+        
+        // Test functions
+        window.testBasicMap = function() {
+            const results = document.getElementById('basic-results');
+            results.innerHTML = '<div class="info">Initializing basic map...</div>';
+            
+            try {
+                basicMap = L.map('basic-map').setView([35.6762, 139.6503], 10);
+                
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors'
+                }).addTo(basicMap);
+                
+                mapUtils.addMapControls(basicMap, {
+                    showScale: true,
+                    showLocation: true,
+                    showLayers: true
+                });
+                
+                results.innerHTML = '<div class="success">✓ Basic map initialized successfully</div>';
+            } catch (error) {
+                results.innerHTML = `<div class="error">✗ Error: ${error.message}</div>`;
+            }
+        };
+        
+        window.addTestMarkers = function() {
+            const results = document.getElementById('basic-results');
+            
+            if (!basicMap) {
+                results.innerHTML = '<div class="error">✗ Please initialize map first</div>';
+                return;
+            }
+            
+            try {
+                const testLocations = [
+                    { name: 'Tokyo Station', lat: 35.6812, lng: 139.7671, type: 'transport' },
+                    { name: 'Hotel Shibuya', lat: 35.6598, lng: 139.7006, type: 'accommodation' },
+                    { name: 'Senso-ji Temple', lat: 35.7148, lng: 139.7967, type: 'attraction' },
+                    { name: 'Tsukiji Market', lat: 35.6654, lng: 139.7707, type: 'food' }
+                ];
+                
+                testLocations.forEach(location => {
+                    const marker = mapUtils.createEnhancedMarker(location, {
+                        type: location.type,
+                        showPopup: true
+                    });
+                    marker.addTo(basicMap);
+                });
+                
+                results.innerHTML += '<div class="success">✓ Enhanced markers added successfully</div>';
+            } catch (error) {
+                results.innerHTML += `<div class="error">✗ Marker error: ${error.message}</div>`;
+            }
+        };
+        
+        window.testCurrentLocation = async function() {
+            const results = document.getElementById('basic-results');
+            
+            if (!basicMap) {
+                results.innerHTML = '<div class="error">✗ Please initialize map first</div>';
+                return;
+            }
+            
+            try {
+                results.innerHTML += '<div class="info">Getting current location...</div>';
+                const location = await mapUtils.getCurrentLocation(basicMap);
+                results.innerHTML += `<div class="success">✓ Current location: ${location.lat.toFixed(6)}, ${location.lng.toFixed(6)} (±${location.accuracy}m)</div>`;
+            } catch (error) {
+                results.innerHTML += `<div class="error">✗ Location error: ${error.message}</div>`;
+            }
+        };
+        
+        window.testGeocode = async function() {
+            const results = document.getElementById('geocoding-results');
+            const query = document.getElementById('search-input').value.trim();
+            
+            if (!query) {
+                results.innerHTML = '<div class="error">✗ Please enter a search term</div>';
+                return;
+            }
+            
+            try {
+                results.innerHTML = '<div class="info">Searching...</div>';
+                const locations = await mapUtils.geocodeAddress(query);
+                
+                if (locations.length > 0) {
+                    let output = `<div class="success">✓ Found ${locations.length} results:</div>`;
+                    locations.slice(0, 3).forEach((loc, i) => {
+                        output += `<div>${i + 1}. ${loc.name} (${loc.lat.toFixed(4)}, ${loc.lng.toFixed(4)})</div>`;
+                    });
+                    results.innerHTML = output;
+                } else {
+                    results.innerHTML = '<div class="error">✗ No results found</div>';
+                }
+            } catch (error) {
+                results.innerHTML = `<div class="error">✗ Geocoding error: ${error.message}</div>`;
+            }
+        };
+        
+        window.testReverseGeocode = async function() {
+            const results = document.getElementById('geocoding-results');
+            
+            try {
+                results.innerHTML = '<div class="info">Reverse geocoding Tokyo Station...</div>';
+                const address = await mapUtils.reverseGeocode(35.6812, 139.7671);
+                
+                if (address) {
+                    results.innerHTML = `<div class="success">✓ Address: ${address.display_name}</div>`;
+                } else {
+                    results.innerHTML = '<div class="error">✗ No address found</div>';
+                }
+            } catch (error) {
+                results.innerHTML = `<div class="error">✗ Reverse geocoding error: ${error.message}</div>`;
+            }
+        };
+        
+        window.testRouteVisualization = async function() {
+            const results = document.getElementById('route-results');
+            
+            if (!routeMap) {
+                routeMap = L.map('route-map').setView([35.6762, 139.6503], 10);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors'
+                }).addTo(routeMap);
+            }
+            
+            try {
+                results.innerHTML = '<div class="info">Creating Tokyo route...</div>';
+                
+                const tokyoLocations = [
+                    { name: 'Tokyo Station', lat: 35.6812, lng: 139.7671 },
+                    { name: 'Imperial Palace', lat: 35.6852, lng: 139.7528 },
+                    { name: 'Senso-ji Temple', lat: 35.7148, lng: 139.7967 },
+                    { name: 'Tokyo Skytree', lat: 35.7101, lng: 139.8107 }
+                ];
+                
+                const route = await mapUtils.createRoute(tokyoLocations);
+                
+                route.polyline.addTo(routeMap);
+                route.markers.forEach(marker => marker.addTo(routeMap));
+                
+                const bounds = L.latLngBounds(tokyoLocations.map(loc => [loc.lat, loc.lng]));
+                routeMap.fitBounds(bounds.pad(0.1));
+                
+                results.innerHTML = `<div class="success">✓ Route created: ${mapUtils.formatDistance(route.distance)}, ${mapUtils.formatDuration(route.duration)}</div>`;
+            } catch (error) {
+                results.innerHTML = `<div class="error">✗ Route error: ${error.message}</div>`;
+            }
+        };
+        
+        window.testEuropeRoute = async function() {
+            const results = document.getElementById('route-results');
+            
+            if (!routeMap) {
+                routeMap = L.map('route-map').setView([50.0, 10.0], 4);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors'
+                }).addTo(routeMap);
+            }
+            
+            try {
+                results.innerHTML = '<div class="info">Creating Europe route...</div>';
+                
+                const europeLocations = [
+                    { name: 'London', lat: 51.5074, lng: -0.1278 },
+                    { name: 'Paris', lat: 48.8566, lng: 2.3522 },
+                    { name: 'Berlin', lat: 52.5200, lng: 13.4050 },
+                    { name: 'Rome', lat: 41.9028, lng: 12.4964 }
+                ];
+                
+                const route = await mapUtils.createRoute(europeLocations, {
+                    color: '#10b981',
+                    weight: 4
+                });
+                
+                route.polyline.addTo(routeMap);
+                route.markers.forEach(marker => marker.addTo(routeMap));
+                
+                const bounds = L.latLngBounds(europeLocations.map(loc => [loc.lat, loc.lng]));
+                routeMap.fitBounds(bounds.pad(0.1));
+                
+                results.innerHTML = `<div class="success">✓ Europe route: ${mapUtils.formatDistance(route.distance)}, ${mapUtils.formatDuration(route.duration)}</div>`;
+            } catch (error) {
+                results.innerHTML = `<div class="error">✗ Route error: ${error.message}</div>`;
+            }
+        };
+        
+        window.clearRoutes = function() {
+            if (routeMap) {
+                routeMap.eachLayer(layer => {
+                    if (layer instanceof L.Polyline || layer instanceof L.Marker) {
+                        routeMap.removeLayer(layer);
+                    }
+                });
+                document.getElementById('route-results').innerHTML = '<div class="info">Routes cleared</div>';
+            }
+        };
+        
+        window.testLocationSearchModal = function() {
+            const results = document.getElementById('modal-results');
+            
+            try {
+                locationSearchComponent.renderSearchModal(1, async (tripId, locationData) => {
+                    results.innerHTML = `<div class="success">✓ Location selected: ${locationData.name} (${locationData.lat.toFixed(4)}, ${locationData.lng.toFixed(4)})</div>`;
+                    console.log('Selected location:', locationData);
+                });
+                
+                results.innerHTML = '<div class="info">Location search modal opened</div>';
+            } catch (error) {
+                results.innerHTML = `<div class="error">✗ Modal error: ${error.message}</div>`;
+            }
+        };
+        
+        window.testGPSAccuracy = function() {
+            const results = document.getElementById('gps-results');
+            
+            if (!navigator.geolocation) {
+                results.innerHTML = '<div class="error">✗ Geolocation not supported</div>';
+                return;
+            }
+            
+            results.innerHTML = '<div class="info">Testing GPS accuracy...</div>';
+            
+            const options = {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0
+            };
+            
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const accuracy = position.coords.accuracy;
+                    const speed = position.coords.speed;
+                    const heading = position.coords.heading;
+                    
+                    let accuracyLevel = 'Poor';
+                    if (accuracy < 10) accuracyLevel = 'Excellent';
+                    else if (accuracy < 50) accuracyLevel = 'Good';
+                    else if (accuracy < 100) accuracyLevel = 'Fair';
+                    
+                    results.innerHTML = `
+                        <div class="success">✓ GPS Test Results:</div>
+                        <div>Accuracy: ±${Math.round(accuracy)}m (${accuracyLevel})</div>
+                        <div>Coordinates: ${position.coords.latitude.toFixed(6)}, ${position.coords.longitude.toFixed(6)}</div>
+                        <div>Speed: ${speed ? Math.round(speed * 3.6) + ' km/h' : 'Not available'}</div>
+                        <div>Heading: ${heading ? Math.round(heading) + '°' : 'Not available'}</div>
+                        <div>Timestamp: ${new Date(position.timestamp).toLocaleTimeString()}</div>
+                    `;
+                },
+                (error) => {
+                    results.innerHTML = `<div class="error">✗ GPS Error: ${error.message}</div>`;
+                },
+                options
+            );
+        };
+        
+        window.startLocationTracking = function() {
+            const results = document.getElementById('gps-results');
+            
+            if (trackingInterval) {
+                results.innerHTML = '<div class="error">✗ Tracking already active</div>';
+                return;
+            }
+            
+            results.innerHTML = '<div class="info">Starting location tracking...</div>';
+            let updateCount = 0;
+            
+            trackingInterval = setInterval(() => {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        updateCount++;
+                        results.innerHTML = `
+                            <div class="success">✓ Tracking active (${updateCount} updates)</div>
+                            <div>Latest: ${position.coords.latitude.toFixed(6)}, ${position.coords.longitude.toFixed(6)}</div>
+                            <div>Accuracy: ±${Math.round(position.coords.accuracy)}m</div>
+                            <div>Last update: ${new Date().toLocaleTimeString()}</div>
+                        `;
+                    },
+                    (error) => {
+                        results.innerHTML += `<div class="error">Tracking error: ${error.message}</div>`;
+                    },
+                    { enableHighAccuracy: true, timeout: 5000, maximumAge: 30000 }
+                );
+            }, 5000);
+        };
+        
+        window.stopLocationTracking = function() {
+            const results = document.getElementById('gps-results');
+            
+            if (trackingInterval) {
+                clearInterval(trackingInterval);
+                trackingInterval = null;
+                results.innerHTML += '<div class="info">Location tracking stopped</div>';
+            } else {
+                results.innerHTML = '<div class="error">✗ No active tracking</div>';
+            }
+        };
+        
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Map integration test suite loaded');
+        });
+    </script>
+</body>
+</html>

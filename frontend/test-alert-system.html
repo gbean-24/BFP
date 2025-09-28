@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alert System Test - Tourism Safety Tracker</title>
+    <link rel="stylesheet" href="./src/styles/main.css">
+    <style>
+        body {
+            padding: 2rem;
+            background: #f8fafc;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .test-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+        .status {
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+        .status.success {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #86efac;
+        }
+        .status.error {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fca5a5;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🚨 Alert System Test</h1>
+        <p>This page tests the enhanced alert system functionality including sound notifications, visual indicators, and emergency response flows.</p>
+        
+        <div class="test-section">
+            <h2>Alert System Features Test</h2>
+            <div class="test-buttons">
+                <button id="test-low-alert" class="btn btn-secondary">Test Low Priority Alert</button>
+                <button id="test-medium-alert" class="btn btn-secondary">Test Medium Priority Alert</button>
+                <button id="test-high-alert" class="btn btn-secondary">Test High Priority Alert</button>
+                <button id="test-critical-alert" class="btn btn-danger">Test Critical Alert</button>
+            </div>
+            <div class="test-buttons">
+                <button id="test-sound" class="btn btn-secondary">Test Notification Sound</button>
+                <button id="test-emergency-sound" class="btn btn-secondary">Test Emergency Sound</button>
+                <button id="toggle-sound" class="btn btn-secondary">Toggle Sound</button>
+            </div>
+            <div id="test-status" class="status" style="display: none;"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Alert Display</h2>
+            <div id="alerts-container"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import AlertsComponent from './src/components/alerts.js';
+
+        // Initialize alerts component
+        const alertsComponent = new AlertsComponent();
+        
+        // Mock some test data
+        alertsComponent.alerts = [
+            {
+                id: 1,
+                type: 'location_deviation',
+                message: 'You seem to be far from your planned route. Are you safe?',
+                created_at: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
+                status: 'active',
+                severity: 'medium',
+                trip_id: 1
+            },
+            {
+                id: 2,
+                type: 'check_in',
+                message: 'Regular safety check-in',
+                created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+                status: 'responded',
+                severity: 'low',
+                response: 'safe',
+                response_time: new Date(Date.now() - 2 * 60 * 60 * 1000 + 5 * 60 * 1000).toISOString(),
+                trip_id: 1
+            },
+            {
+                id: 3,
+                type: 'emergency',
+                message: 'Emergency alert triggered. Please respond immediately.',
+                created_at: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
+                status: 'escalated',
+                severity: 'critical',
+                trip_id: 1,
+                escalated_at: new Date(Date.now() - 5 * 60 * 1000).toISOString()
+            }
+        ];
+        
+        alertsComponent.activeAlerts = alertsComponent.alerts.filter(a => a.status === 'active');
+        alertsComponent.applyFilters();
+
+        // Set up the container
+        const container = document.getElementById('alerts-container');
+        container.id = 'content';
+        
+        // Initialize the component
+        await alertsComponent.init();
+
+        // Test button handlers
+        document.getElementById('test-low-alert').addEventListener('click', () => {
+            testAlert('low', 'check_in', 'This is a low priority test alert for routine safety check.');
+        });
+
+        document.getElementById('test-medium-alert').addEventListener('click', () => {
+            testAlert('medium', 'location_deviation', 'This is a medium priority test alert for location deviation.');
+        });
+
+        document.getElementById('test-high-alert').addEventListener('click', () => {
+            testAlert('high', 'battery_low', 'This is a high priority test alert for low battery warning.');
+        });
+
+        document.getElementById('test-critical-alert').addEventListener('click', () => {
+            testAlert('critical', 'emergency', 'This is a CRITICAL test alert simulating an emergency situation.');
+        });
+
+        document.getElementById('test-sound').addEventListener('click', () => {
+            alertsComponent.playNotificationSound();
+            showStatus('Notification sound played', 'success');
+        });
+
+        document.getElementById('test-emergency-sound').addEventListener('click', () => {
+            alertsComponent.playEmergencySound();
+            showStatus('Emergency sound played', 'success');
+        });
+
+        document.getElementById('toggle-sound').addEventListener('click', () => {
+            alertsComponent.soundEnabled = !alertsComponent.soundEnabled;
+            localStorage.setItem('alertSoundEnabled', alertsComponent.soundEnabled);
+            showStatus(`Sound ${alertsComponent.soundEnabled ? 'enabled' : 'disabled'}`, 'success');
+            alertsComponent.render();
+        });
+
+        function testAlert(severity, type, message) {
+            const testAlert = {
+                id: 'test-' + Date.now(),
+                type: type,
+                message: message,
+                severity: severity,
+                created_at: new Date().toISOString(),
+                status: 'active',
+                trip_id: 1
+            };
+
+            // Add to alerts
+            alertsComponent.alerts.unshift(testAlert);
+            alertsComponent.activeAlerts.unshift(testAlert);
+            alertsComponent.applyFilters();
+
+            // Handle the new alert
+            alertsComponent.handleNewAlerts([testAlert]);
+
+            // Re-render
+            alertsComponent.render();
+
+            showStatus(`${severity.toUpperCase()} priority alert created and displayed`, 'success');
+        }
+
+        function showStatus(message, type) {
+            const status = document.getElementById('test-status');
+            status.textContent = message;
+            status.className = `status ${type}`;
+            status.style.display = 'block';
+            
+            setTimeout(() => {
+                status.style.display = 'none';
+            }, 3000);
+        }
+
+        // Log component state for debugging
+        console.log('Alert System Test Initialized');
+        console.log('Alerts:', alertsComponent.alerts);
+        console.log('Active Alerts:', alertsComponent.activeAlerts);
+        console.log('Sound Enabled:', alertsComponent.soundEnabled);
+    </script>
+</body>
+</html>

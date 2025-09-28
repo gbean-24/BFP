@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trip Management Enhancement Test</title>
+    <link rel="stylesheet" href="src/styles/main.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .test-section {
+            margin-bottom: 2rem;
+            padding: 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+        }
+        .test-results {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #f9fafb;
+            border-radius: 6px;
+        }
+        .pass { color: #059669; }
+        .fail { color: #dc2626; }
+        .pending { color: #d97706; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Trip Management Enhancement Test Suite</h1>
+        <p>Testing all features implemented in Task 5: Trip Management Interface Enhancement</p>
+        
+        <div class="test-section">
+            <h2>Test 1: Trip Creation Form Validation</h2>
+            <button id="test-validation" class="btn btn-primary">Test Form Validation</button>
+            <div id="validation-results" class="test-results"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Test 2: Trip List Display and Filtering</h2>
+            <button id="test-filtering" class="btn btn-primary">Test Filtering & Sorting</button>
+            <div id="filtering-results" class="test-results"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Test 3: Trip CRUD Operations</h2>
+            <button id="test-crud" class="btn btn-primary">Test CRUD Operations</button>
+            <div id="crud-results" class="test-results"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Test 4: Trip Details Modal</h2>
+            <button id="test-details" class="btn btn-primary">Test Trip Details</button>
+            <div id="details-results" class="test-results"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Test 5: Trip Sharing Interface</h2>
+            <button id="test-sharing" class="btn btn-primary">Test Sharing Features</button>
+            <div id="sharing-results" class="test-results"></div>
+        </div>
+
+        <!-- Trip Management Component Container -->
+        <div id="content"></div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script type="module">
+        import TripsComponent from './src/components/trips.js';
+
+        let tripsComponent;
+        let testResults = {};
+
+        // Initialize the trips component
+        async function initTripsComponent() {
+            tripsComponent = new TripsComponent();
+            await tripsComponent.init();
+        }
+
+        // Test 1: Form Validation
+        document.getElementById('test-validation').addEventListener('click', async () => {
+            const results = document.getElementById('validation-results');
+            results.innerHTML = '<div class="pending">Running validation tests...</div>';
+            
+            const tests = [];
+            
+            try {
+                // Test trip name validation
+                const nameValid = tripsComponent.validateTripName('Test Trip');
+                const nameInvalid = !tripsComponent.validateTripName('T');
+                tests.push({
+                    name: 'Trip name validation',
+                    pass: nameValid && nameInvalid
+                });
+
+                // Test date validation
+                document.getElementById('start-date').value = '2024-12-01';
+                document.getElementById('end-date').value = '2024-11-01';
+                const dateInvalid = !tripsComponent.validateDates();
+                tests.push({
+                    name: 'Date validation',
+                    pass: dateInvalid
+                });
+
+                // Test character count
+                tripsComponent.updateCharacterCount('Test description');
+                const countElement = document.getElementById('description-count');
+                tests.push({
+                    name: 'Character count update',
+                    pass: countElement && countElement.textContent === '16'
+                });
+
+                displayTestResults(results, tests);
+            } catch (error) {
+                results.innerHTML = `<div class="fail">Validation tests failed: ${error.message}</div>`;
+            }
+        });
+
+        // Test 2: Filtering and Sorting
+        document.getElementById('test-filtering').addEventListener('click', async () => {
+            const results = document.getElementById('filtering-results');
+            results.innerHTML = '<div class="pending">Running filtering tests...</div>';
+            
+            const tests = [];
+            
+            try {
+                // Test filter application
+                tripsComponent.currentFilter = 'active';
+                tripsComponent.applyFiltersAndSort();
+                const activeFiltered = tripsComponent.filteredTrips.every(trip => trip.status === 'active');
+                tests.push({
+                    name: 'Status filtering',
+                    pass: activeFiltered
+                });
+
+                // Test sorting
+                tripsComponent.currentSort = 'name_asc';
+                tripsComponent.applyFiltersAndSort();
+                const sorted = tripsComponent.filteredTrips.length <= 1 || 
+                    tripsComponent.filteredTrips[0].name <= tripsComponent.filteredTrips[1].name;
+                tests.push({
+                    name: 'Name sorting',
+                    pass: sorted
+                });
+
+                // Test search functionality
+                tripsComponent.handleSearch('Tokyo');
+                const searchFiltered = tripsComponent.filteredTrips.every(trip => 
+                    trip.name.toLowerCase().includes('tokyo') || 
+                    (trip.description && trip.description.toLowerCase().includes('tokyo'))
+                );
+                tests.push({
+                    name: 'Search functionality',
+                    pass: searchFiltered
+                });
+
+                displayTestResults(results, tests);
+            } catch (error) {
+                results.innerHTML = `<div class="fail">Filtering tests failed: ${error.message}</div>`;
+            }
+        });
+
+        // Test 3: CRUD Operations
+        document.getElementById('test-crud').addEventListener('click', async () => {
+            const results = document.getElementById('crud-results');
+            results.innerHTML = '<div class="pending">Running CRUD tests...</div>';
+            
+            const tests = [];
+            
+            try {
+                // Test trip creation modal
+                tripsComponent.showTripModal();
+                const modalVisible = document.getElementById('trip-modal').style.display !== 'none';
+                tests.push({
+                    name: 'Trip creation modal display',
+                    pass: modalVisible
+                });
+
+                // Test form population for editing
+                if (tripsComponent.trips.length > 0) {
+                    await tripsComponent.showEditTripModal(tripsComponent.trips[0].id);
+                    const namePopulated = document.getElementById('trip-name').value === tripsComponent.trips[0].name;
+                    tests.push({
+                        name: 'Edit form population',
+                        pass: namePopulated
+                    });
+                }
+
+                // Test email parsing
+                const emails = tripsComponent.parseEmergencyContacts('test@example.com, invalid-email, another@test.com');
+                tests.push({
+                    name: 'Emergency contact parsing',
+                    pass: emails.length === 2 && emails.includes('test@example.com')
+                });
+
+                displayTestResults(results, tests);
+            } catch (error) {
+                results.innerHTML = `<div class="fail">CRUD tests failed: ${error.message}</div>`;
+            }
+        });
+
+        // Test 4: Trip Details
+        document.getElementById('test-details').addEventListener('click', async () => {
+            const results = document.getElementById('details-results');
+            results.innerHTML = '<div class="pending">Running details tests...</div>';
+            
+            const tests = [];
+            
+            try {
+                // Test date formatting
+                const formattedDate = tripsComponent.formatDate('2024-02-01');
+                tests.push({
+                    name: 'Date formatting',
+                    pass: formattedDate.includes('Feb') && formattedDate.includes('2024')
+                });
+
+                // Test duration calculation
+                const duration = tripsComponent.calculateDuration('2024-02-01', '2024-02-07');
+                tests.push({
+                    name: 'Duration calculation',
+                    pass: duration === 6
+                });
+
+                // Test relative time formatting
+                const relativeTime = tripsComponent.formatRelativeTime(new Date().toISOString());
+                tests.push({
+                    name: 'Relative time formatting',
+                    pass: relativeTime === 'today'
+                });
+
+                displayTestResults(results, tests);
+            } catch (error) {
+                results.innerHTML = `<div class="fail">Details tests failed: ${error.message}</div>`;
+            }
+        });
+
+        // Test 5: Sharing Features
+        document.getElementById('test-sharing').addEventListener('click', async () => {
+            const results = document.getElementById('sharing-results');
+            results.innerHTML = '<div class="pending">Running sharing tests...</div>';
+            
+            const tests = [];
+            
+            try {
+                // Test share modal display
+                if (tripsComponent.trips.length > 0) {
+                    await tripsComponent.showShareTripModal(tripsComponent.trips[0].id);
+                    const shareModalVisible = document.getElementById('share-trip-modal').style.display !== 'none';
+                    tests.push({
+                        name: 'Share modal display',
+                        pass: shareModalVisible
+                    });
+
+                    // Test share link generation
+                    const shareLink = document.getElementById('share-link').value;
+                    tests.push({
+                        name: 'Share link generation',
+                        pass: shareLink.includes('shared-trip')
+                    });
+                }
+
+                // Test copy functionality (mock)
+                tests.push({
+                    name: 'Copy functionality available',
+                    pass: typeof tripsComponent.copyShareLink === 'function'
+                });
+
+                displayTestResults(results, tests);
+            } catch (error) {
+                results.innerHTML = `<div class="fail">Sharing tests failed: ${error.message}</div>`;
+            }
+        });
+
+        function displayTestResults(container, tests) {
+            const passed = tests.filter(t => t.pass).length;
+            const total = tests.length;
+            
+            let html = `<h4>Results: ${passed}/${total} tests passed</h4>`;
+            tests.forEach(test => {
+                const status = test.pass ? 'pass' : 'fail';
+                html += `<div class="${status}">✓ ${test.name}: ${test.pass ? 'PASS' : 'FAIL'}</div>`;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // Initialize when page loads
+        window.addEventListener('load', initTripsComponent);
+    </script>
+</body>
+</html>

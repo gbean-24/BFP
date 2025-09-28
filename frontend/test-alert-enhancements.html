@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alert System Enhancements Test - Tourism Safety Tracker</title>
+    <link rel="stylesheet" href="./src/styles/main.css">
+    <style>
+        .demo-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .demo-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        .feature-demo {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1.5rem;
+            background: #f8fafc;
+        }
+        .feature-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #374151;
+        }
+        .demo-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+        .status-indicator {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+        .status-success {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #86efac;
+        }
+        .status-info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #93c5fd;
+        }
+        .status-warning {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fbbf24;
+        }
+        .status-error {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fca5a5;
+        }
+        .test-log {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 1rem;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 1rem;
+        }
+        .enhancement-list {
+            list-style: none;
+            padding: 0;
+        }
+        .enhancement-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .enhancement-list li:last-child {
+            border-bottom: none;
+        }
+        .check-icon {
+            color: #10b981;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <header style="text-align: center; margin-bottom: 3rem;">
+            <h1>🚨 Alert System Enhancements Demo</h1>
+            <p style="color: #6b7280; font-size: 1.125rem;">
+                Testing enhanced alert notification display, categorization, emergency response, 
+                sound notifications, visual indicators, and escalation flows.
+            </p>
+        </header>
+
+        <div class="demo-section">
+            <h2>✨ Enhanced Features Implemented</h2>
+            <ul class="enhancement-list">
+                <li><span class="check-icon">✅</span> Enhanced alert notification display and categorization</li>
+                <li><span class="check-icon">✅</span> Improved emergency response modal with better UX</li>
+                <li><span class="check-icon">✅</span> Alert history filtering and search functionality</li>
+                <li><span class="check-icon">✅</span> Alert sound notifications and visual indicators</li>
+                <li><span class="check-icon">✅</span> Emergency escalation flow and countdown timers</li>
+                <li><span class="check-icon">✅</span> Severity-based alert prioritization</li>
+                <li><span class="check-icon">✅</span> Browser notifications and visual feedback</li>
+                <li><span class="check-icon">✅</span> Mobile-responsive emergency interface</li>
+                <li><span class="check-icon">✅</span> Keyboard shortcuts for emergency responses</li>
+                <li><span class="check-icon">✅</span> Alert statistics and analytics</li>
+            </ul>
+        </div>
+
+        <div class="demo-grid">
+            <div class="feature-demo">
+                <h3 class="feature-title">🔊 Sound Notifications</h3>
+                <p>Test different alert sounds and audio feedback.</p>
+                <div class="demo-buttons">
+                    <button id="test-notification-sound" class="btn btn-secondary btn-small">Notification Sound</button>
+                    <button id="test-emergency-sound" class="btn btn-danger btn-small">Emergency Sound</button>
+                    <button id="toggle-sound" class="btn btn-secondary btn-small">Toggle Sound</button>
+                </div>
+                <div id="sound-status" class="status-indicator status-info">Sound: Enabled</div>
+            </div>
+
+            <div class="feature-demo">
+                <h3 class="feature-title">🚨 Emergency Alerts</h3>
+                <p>Test different severity levels and emergency responses.</p>
+                <div class="demo-buttons">
+                    <button id="test-low-alert" class="btn btn-success btn-small">Low Priority</button>
+                    <button id="test-medium-alert" class="btn btn-secondary btn-small">Medium Priority</button>
+                    <button id="test-high-alert" class="btn btn-warning btn-small">High Priority</button>
+                    <button id="test-critical-alert" class="btn btn-danger btn-small">Critical Alert</button>
+                </div>
+                <div id="alert-status" class="status-indicator status-success">Ready to test alerts</div>
+            </div>
+
+            <div class="feature-demo">
+                <h3 class="feature-title">🔍 Search & Filter</h3>
+                <p>Test alert filtering and search capabilities.</p>
+                <div class="demo-buttons">
+                    <button id="filter-active" class="btn btn-secondary btn-small">Filter Active</button>
+                    <button id="filter-critical" class="btn btn-danger btn-small">Filter Critical</button>
+                    <button id="search-emergency" class="btn btn-secondary btn-small">Search "Emergency"</button>
+                    <button id="clear-filters" class="btn btn-secondary btn-small">Clear All</button>
+                </div>
+                <div id="filter-status" class="status-indicator status-info">No filters applied</div>
+            </div>
+
+            <div class="feature-demo">
+                <h3 class="feature-title">⏱️ Countdown Timer</h3>
+                <p>Test emergency response countdown and escalation.</p>
+                <div class="demo-buttons">
+                    <button id="start-countdown" class="btn btn-warning btn-small">Start 30s Timer</button>
+                    <button id="test-escalation" class="btn btn-danger btn-small">Test Escalation</button>
+                    <button id="stop-countdown" class="btn btn-secondary btn-small">Stop Timer</button>
+                </div>
+                <div id="countdown-status" class="status-indicator status-info">Timer ready</div>
+            </div>
+
+            <div class="feature-demo">
+                <h3 class="feature-title">📊 Alert Statistics</h3>
+                <p>View alert analytics and response metrics.</p>
+                <div class="demo-buttons">
+                    <button id="show-stats" class="btn btn-secondary btn-small">Show Statistics</button>
+                    <button id="generate-report" class="btn btn-secondary btn-small">Generate Report</button>
+                </div>
+                <div id="stats-display" class="status-indicator status-info">Click to view statistics</div>
+            </div>
+
+            <div class="feature-demo">
+                <h3 class="feature-title">📱 Browser Notifications</h3>
+                <p>Test browser notification permissions and display.</p>
+                <div class="demo-buttons">
+                    <button id="request-permission" class="btn btn-secondary btn-small">Request Permission</button>
+                    <button id="test-notification" class="btn btn-secondary btn-small">Test Notification</button>
+                </div>
+                <div id="notification-status" class="status-indicator status-warning">Permission not requested</div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>🎯 Alert System Display</h2>
+            <div id="alerts-container"></div>
+        </div>
+
+        <div class="demo-section">
+            <h2>📝 Test Log</h2>
+            <div id="test-log" class="test-log">
+                Alert System Enhancement Demo Initialized...<br>
+                Ready for testing. Click buttons above to test features.<br>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import AlertsComponent from './src/components/alerts.js';
+
+        // Initialize the enhanced alerts component
+        const alertsComponent = new AlertsComponent();
+        let testCounter = 1;
+
+        // Set up test environment
+        function setupTestEnvironment() {
+            // Mock comprehensive alert data
+            alertsComponent.alerts = [
+                {
+                    id: 1,
+                    type: 'location_deviation',
+                    message: 'You seem to be far from your planned route in downtown Tokyo. Are you safe?',
+                    created_at: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
+                    status: 'active',
+                    severity: 'medium',
+                    trip_id: 1
+                },
+                {
+                    id: 2,
+                    type: 'check_in',
+                    message: 'Regular safety check-in - please confirm your status',
+                    created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+                    status: 'responded',
+                    severity: 'low',
+                    response: 'safe',
+                    response_time: new Date(Date.now() - 2 * 60 * 60 * 1000 + 5 * 60 * 1000).toISOString(),
+                    trip_id: 1
+                },
+                {
+                    id: 3,
+                    type: 'emergency',
+                    message: 'CRITICAL: Emergency alert triggered from panic button. Please respond immediately.',
+                    created_at: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
+                    status: 'escalated',
+                    severity: 'critical',
+                    trip_id: 1,
+                    escalated_at: new Date(Date.now() - 5 * 60 * 1000).toISOString()
+                },
+                {
+                    id: 4,
+                    type: 'battery_low',
+                    message: 'Your device battery is critically low (8%). Please charge immediately to maintain safety monitoring.',
+                    created_at: new Date(Date.now() - 45 * 60 * 1000).toISOString(),
+                    status: 'active',
+                    severity: 'high',
+                    trip_id: 1
+                },
+                {
+                    id: 5,
+                    type: 'geofence',
+                    message: 'You have entered a restricted area near the embassy district. Exercise caution.',
+                    created_at: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
+                    status: 'active',
+                    severity: 'high',
+                    trip_id: 2
+                },
+                {
+                    id: 6,
+                    type: 'offline',
+                    message: 'Connection lost for extended period. Last known location: Shibuya Station.',
+                    created_at: new Date(Date.now() - 25 * 60 * 1000).toISOString(),
+                    status: 'responded',
+                    severity: 'medium',
+                    response: 'safe',
+                    response_time: new Date(Date.now() - 20 * 60 * 1000).toISOString(),
+                    trip_id: 1
+                }
+            ];
+
+            alertsComponent.activeAlerts = alertsComponent.alerts.filter(a => a.status === 'active');
+            alertsComponent.applyFilters();
+
+            // Set up the container
+            const container = document.getElementById('alerts-container');
+            container.id = 'content';
+        }
+
+        // Logging function
+        function log(message, type = 'info') {
+            const logElement = document.getElementById('test-log');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}<br>`;
+            logElement.innerHTML += logEntry;
+            logElement.scrollTop = logElement.scrollHeight;
+            
+            console.log(`[Alert System Demo] ${message}`);
+        }
+
+        // Status update function
+        function updateStatus(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.textContent = message;
+                element.className = `status-indicator status-${type}`;
+            }
+        }
+
+        // Initialize the demo
+        async function initializeDemo() {
+            try {
+                setupTestEnvironment();
+                await alertsComponent.init();
+                log('Alert System Enhancement Demo initialized successfully', 'success');
+                updateStatus('alert-status', 'Alert system ready', 'success');
+                updateStatus('sound-status', `Sound: ${alertsComponent.soundEnabled ? 'Enabled' : 'Disabled'}`, 
+                    alertsComponent.soundEnabled ? 'success' : 'warning');
+            } catch (error) {
+                log(`Initialization error: ${error.message}`, 'error');
+                updateStatus('alert-status', 'Initialization failed', 'error');
+            }
+        }
+
+        // Event handlers for sound testing
+        document.getElementById('test-notification-sound').addEventListener('click', () => {
+            alertsComponent.playNotificationSound();
+            log('Notification sound played');
+            updateStatus('sound-status', 'Notification sound played', 'success');
+        });
+
+        document.getElementById('test-emergency-sound').addEventListener('click', () => {
+            alertsComponent.playEmergencySound();
+            log('Emergency sound played (3 beeps)');
+            updateStatus('sound-status', 'Emergency sound played', 'warning');
+        });
+
+        document.getElementById('toggle-sound').addEventListener('click', () => {
+            alertsComponent.soundEnabled = !alertsComponent.soundEnabled;
+            localStorage.setItem('alertSoundEnabled', alertsComponent.soundEnabled);
+            const status = alertsComponent.soundEnabled ? 'enabled' : 'disabled';
+            log(`Sound ${status}`);
+            updateStatus('sound-status', `Sound: ${status}`, alertsComponent.soundEnabled ? 'success' : 'warning');
+            alertsComponent.render();
+        });
+
+        // Event handlers for alert testing
+        document.getElementById('test-low-alert').addEventListener('click', () => {
+            createTestAlert('low', 'check_in', 'Low priority test: Regular safety check-in reminder.');
+        });
+
+        document.getElementById('test-medium-alert').addEventListener('click', () => {
+            createTestAlert('medium', 'location_deviation', 'Medium priority test: You appear to be off your planned route.');
+        });
+
+        document.getElementById('test-high-alert').addEventListener('click', () => {
+            createTestAlert('high', 'battery_low', 'High priority test: Device battery critically low (12%).');
+        });
+
+        document.getElementById('test-critical-alert').addEventListener('click', () => {
+            createTestAlert('critical', 'emergency', 'CRITICAL TEST: Emergency situation detected. Immediate response required.');
+        });
+
+        // Event handlers for filtering
+        document.getElementById('filter-active').addEventListener('click', () => {
+            alertsComponent.currentFilter = 'active';
+            alertsComponent.applyFilters();
+            alertsComponent.updateAlertsList();
+            log('Applied active alerts filter');
+            updateStatus('filter-status', `Showing ${alertsComponent.filteredAlerts.length} active alerts`, 'info');
+        });
+
+        document.getElementById('filter-critical').addEventListener('click', () => {
+            alertsComponent.currentFilter = 'critical';
+            alertsComponent.applyFilters();
+            alertsComponent.updateAlertsList();
+            log('Applied critical severity filter');
+            updateStatus('filter-status', `Showing ${alertsComponent.filteredAlerts.length} critical alerts`, 'warning');
+        });
+
+        document.getElementById('search-emergency').addEventListener('click', () => {
+            alertsComponent.searchQuery = 'emergency';
+            alertsComponent.applyFilters();
+            alertsComponent.updateAlertsList();
+            log('Applied search filter: "emergency"');
+            updateStatus('filter-status', `Found ${alertsComponent.filteredAlerts.length} emergency alerts`, 'info');
+        });
+
+        document.getElementById('clear-filters').addEventListener('click', () => {
+            alertsComponent.currentFilter = 'all';
+            alertsComponent.searchQuery = '';
+            alertsComponent.applyFilters();
+            alertsComponent.render();
+            log('Cleared all filters');
+            updateStatus('filter-status', 'All filters cleared', 'success');
+        });
+
+        // Event handlers for countdown testing
+        document.getElementById('start-countdown').addEventListener('click', () => {
+            // Create countdown element if it doesn't exist
+            let countdownElement = document.getElementById('countdown');
+            if (!countdownElement) {
+                countdownElement = document.createElement('span');
+                countdownElement.id = 'countdown';
+                document.body.appendChild(countdownElement);
+            }
+            
+            alertsComponent.startCountdown(30);
+            log('Started 30-second countdown timer');
+            updateStatus('countdown-status', 'Countdown active: 30 seconds', 'warning');
+        });
+
+        document.getElementById('test-escalation').addEventListener('click', () => {
+            const testAlert = {
+                id: `escalation-test-${testCounter++}`,
+                type: 'emergency',
+                message: 'Test escalation scenario - no response simulation',
+                severity: 'critical',
+                status: 'active'
+            };
+            
+            alertsComponent.alerts.unshift(testAlert);
+            alertsComponent.handleEmergencyTimeout(testAlert);
+            alertsComponent.render();
+            
+            log('Simulated emergency escalation');
+            updateStatus('countdown-status', 'Escalation test completed', 'error');
+        });
+
+        document.getElementById('stop-countdown').addEventListener('click', () => {
+            if (alertsComponent.countdownInterval) {
+                clearInterval(alertsComponent.countdownInterval);
+                log('Countdown timer stopped');
+                updateStatus('countdown-status', 'Timer stopped', 'info');
+            }
+        });
+
+        // Event handlers for statistics
+        document.getElementById('show-stats').addEventListener('click', () => {
+            const stats = {
+                total: alertsComponent.alerts.length,
+                active: alertsComponent.alerts.filter(a => a.status === 'active').length,
+                responded: alertsComponent.alerts.filter(a => a.status === 'responded').length,
+                escalated: alertsComponent.alerts.filter(a => a.status === 'escalated').length,
+                critical: alertsComponent.alerts.filter(a => a.severity === 'critical').length,
+                avgResponse: alertsComponent.getAverageResponseTime()
+            };
+            
+            log(`Statistics: ${stats.total} total, ${stats.active} active, ${stats.responded} responded, ${stats.escalated} escalated`);
+            updateStatus('stats-display', `${stats.total} total alerts, ${stats.avgResponse} avg response`, 'info');
+        });
+
+        document.getElementById('generate-report').addEventListener('click', () => {
+            const report = {
+                timestamp: new Date().toISOString(),
+                totalAlerts: alertsComponent.alerts.length,
+                activeAlerts: alertsComponent.activeAlerts.length,
+                criticalAlerts: alertsComponent.getCriticalAlertsCount(),
+                averageResponseTime: alertsComponent.getAverageResponseTime(),
+                alertTypes: [...new Set(alertsComponent.alerts.map(a => a.type))],
+                severityDistribution: {
+                    critical: alertsComponent.alerts.filter(a => a.severity === 'critical').length,
+                    high: alertsComponent.alerts.filter(a => a.severity === 'high').length,
+                    medium: alertsComponent.alerts.filter(a => a.severity === 'medium').length,
+                    low: alertsComponent.alerts.filter(a => a.severity === 'low').length
+                }
+            };
+            
+            console.log('Alert System Report:', report);
+            log('Generated comprehensive alert report (check console)');
+            updateStatus('stats-display', 'Report generated (see console)', 'success');
+        });
+
+        // Event handlers for browser notifications
+        document.getElementById('request-permission').addEventListener('click', async () => {
+            if ('Notification' in window) {
+                const permission = await Notification.requestPermission();
+                log(`Notification permission: ${permission}`);
+                updateStatus('notification-status', `Permission: ${permission}`, 
+                    permission === 'granted' ? 'success' : 'warning');
+            } else {
+                log('Browser notifications not supported');
+                updateStatus('notification-status', 'Not supported', 'error');
+            }
+        });
+
+        document.getElementById('test-notification').addEventListener('click', () => {
+            if ('Notification' in window && Notification.permission === 'granted') {
+                const notification = new Notification('Test Alert', {
+                    body: 'This is a test browser notification from the alert system.',
+                    icon: '/favicon.ico',
+                    tag: 'test-alert'
+                });
+                
+                notification.onclick = () => {
+                    window.focus();
+                    notification.close();
+                };
+                
+                log('Test browser notification sent');
+                updateStatus('notification-status', 'Test notification sent', 'success');
+            } else {
+                log('Cannot send notification - permission not granted');
+                updateStatus('notification-status', 'Permission required', 'warning');
+            }
+        });
+
+        // Helper function to create test alerts
+        function createTestAlert(severity, type, message) {
+            const testAlert = {
+                id: `test-${testCounter++}`,
+                type: type,
+                message: message,
+                severity: severity,
+                created_at: new Date().toISOString(),
+                status: 'active',
+                trip_id: 1
+            };
+
+            // Add to alerts
+            alertsComponent.alerts.unshift(testAlert);
+            alertsComponent.activeAlerts.unshift(testAlert);
+            alertsComponent.applyFilters();
+
+            // Handle the new alert
+            alertsComponent.handleNewAlerts([testAlert]);
+
+            // Re-render
+            alertsComponent.render();
+
+            log(`Created ${severity} priority ${type} alert`);
+            updateStatus('alert-status', `${severity.toUpperCase()} alert created`, 
+                severity === 'critical' ? 'error' : severity === 'high' ? 'warning' : 'info');
+        }
+
+        // Initialize the demo when page loads
+        initializeDemo();
+    </script>
+</body>
+</html>

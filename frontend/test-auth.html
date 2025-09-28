@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth Test - Tourism Safety Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        input {
+            width: 200px;
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🛡️ Authentication Test Suite</h1>
+    
+    <div class="test-section">
+        <h2>Form Validation Tests</h2>
+        <div>
+            <input type="email" id="test-email" placeholder="test@example.com">
+            <button onclick="testEmailValidation()">Test Email Validation</button>
+        </div>
+        <div>
+            <input type="password" id="test-password" placeholder="password123">
+            <button onclick="testPasswordValidation()">Test Password Validation</button>
+        </div>
+        <div>
+            <input type="text" id="test-name" placeholder="John Doe">
+            <button onclick="testNameValidation()">Test Name Validation</button>
+        </div>
+        <div id="validation-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Mock Authentication Tests</h2>
+        <div>
+            <button onclick="testMockLogin()">Test Mock Login</button>
+            <button onclick="testMockRegister()">Test Mock Register</button>
+            <button onclick="testTokenManagement()">Test Token Management</button>
+        </div>
+        <div id="auth-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>UI Enhancement Tests</h2>
+        <div>
+            <button onclick="testLoadingStates()">Test Loading States</button>
+            <button onclick="testErrorMessages()">Test Error Messages</button>
+            <button onclick="testFormSwitching()">Test Form Switching</button>
+        </div>
+        <div id="ui-results"></div>
+    </div>
+
+    <script type="module">
+        // Import the auth component for testing
+        import AuthComponent from './src/components/auth.js';
+        
+        // Create a test instance
+        window.testAuth = new AuthComponent();
+        
+        // Validation tests
+        window.testEmailValidation = function() {
+            const email = document.getElementById('test-email').value;
+            const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+            showResult('validation-results', 
+                isValid ? 'Email validation passed ✅' : 'Email validation failed ❌', 
+                isValid ? 'success' : 'error'
+            );
+        };
+
+        window.testPasswordValidation = function() {
+            const password = document.getElementById('test-password').value;
+            const isValid = password.length >= 6;
+            showResult('validation-results', 
+                isValid ? 'Password validation passed ✅' : 'Password validation failed ❌', 
+                isValid ? 'success' : 'error'
+            );
+        };
+
+        window.testNameValidation = function() {
+            const name = document.getElementById('test-name').value;
+            const isValid = name.trim().length >= 2;
+            showResult('validation-results', 
+                isValid ? 'Name validation passed ✅' : 'Name validation failed ❌', 
+                isValid ? 'success' : 'error'
+            );
+        };
+
+        // Auth tests
+        window.testMockLogin = async function() {
+            try {
+                showResult('auth-results', 'Testing mock login...', 'info');
+                
+                // Import API client
+                const { default: apiClient } = await import('./src/api/client.js');
+                const response = await apiClient.login({ 
+                    email: 'test@example.com', 
+                    password: 'password123' 
+                });
+                
+                if (response.token) {
+                    showResult('auth-results', 'Mock login successful ✅', 'success');
+                } else {
+                    showResult('auth-results', 'Mock login failed - no token ❌', 'error');
+                }
+            } catch (error) {
+                showResult('auth-results', `Mock login error: ${error.message} ❌`, 'error');
+            }
+        };
+
+        window.testMockRegister = async function() {
+            try {
+                showResult('auth-results', 'Testing mock registration...', 'info');
+                
+                const { default: apiClient } = await import('./src/api/client.js');
+                const response = await apiClient.register({ 
+                    name: 'Test User',
+                    email: 'newuser@example.com', 
+                    password: 'password123' 
+                });
+                
+                if (response.success) {
+                    showResult('auth-results', 'Mock registration successful ✅', 'success');
+                } else {
+                    showResult('auth-results', 'Mock registration failed ❌', 'error');
+                }
+            } catch (error) {
+                showResult('auth-results', `Mock registration error: ${error.message} ❌`, 'error');
+            }
+        };
+
+        window.testTokenManagement = function() {
+            // Test token storage
+            const testToken = 'test_token_' + Date.now();
+            localStorage.setItem('auth_token', testToken);
+            
+            const storedToken = localStorage.getItem('auth_token');
+            if (storedToken === testToken) {
+                showResult('auth-results', 'Token storage working ✅', 'success');
+                
+                // Test token clearing
+                localStorage.removeItem('auth_token');
+                const clearedToken = localStorage.getItem('auth_token');
+                
+                if (!clearedToken) {
+                    showResult('auth-results', 'Token clearing working ✅', 'success');
+                } else {
+                    showResult('auth-results', 'Token clearing failed ❌', 'error');
+                }
+            } else {
+                showResult('auth-results', 'Token storage failed ❌', 'error');
+            }
+        };
+
+        // UI tests
+        window.testLoadingStates = function() {
+            const button = document.createElement('button');
+            button.textContent = 'Test Button';
+            button.dataset.originalText = 'Test Button';
+            
+            // Simulate loading state
+            button.disabled = true;
+            button.classList.add('loading');
+            button.innerHTML = '<span class="loading-spinner"></span>Loading...';
+            
+            showResult('ui-results', 'Loading state applied ✅', 'success');
+            
+            // Simulate loading complete
+            setTimeout(() => {
+                button.disabled = false;
+                button.classList.remove('loading');
+                button.textContent = button.dataset.originalText;
+                showResult('ui-results', 'Loading state cleared ✅', 'success');
+            }, 2000);
+        };
+
+        window.testErrorMessages = function() {
+            const testMessages = [
+                { message: 'Test success message', type: 'success' },
+                { message: 'Test error message', type: 'danger' },
+                { message: 'Test warning message', type: 'warning' },
+                { message: 'Test info message', type: 'info' }
+            ];
+            
+            testMessages.forEach((test, index) => {
+                setTimeout(() => {
+                    showResult('ui-results', `${test.type} message: ${test.message}`, test.type === 'danger' ? 'error' : test.type);
+                }, index * 1000);
+            });
+        };
+
+        window.testFormSwitching = function() {
+            showResult('ui-results', 'Form switching functionality would be tested in main app ℹ️', 'info');
+        };
+
+        function showResult(containerId, message, type) {
+            const container = document.getElementById(containerId);
+            const result = document.createElement('div');
+            result.className = `test-result ${type}`;
+            result.textContent = message;
+            container.appendChild(result);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (result.parentNode) {
+                    result.parentNode.removeChild(result);
+                }
+            }, 5000);
+        }
+
+        // Run initial tests
+        showResult('validation-results', 'Test suite loaded successfully ✅', 'success');
+    </script>
+</body>
+</html>

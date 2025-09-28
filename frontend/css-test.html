@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS Test - Tourism Safety Tracker</title>
+    <link rel="stylesheet" href="./src/styles/main.css">
+    <style>
+        .test-container {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>CSS Design System Test</h1>
+        
+        <div class="test-section">
+            <h2>Color Variables Test</h2>
+            <div style="background: var(--primary-500); color: white; padding: 10px; margin: 5px 0;">Primary Color</div>
+            <div style="background: var(--success-500); color: white; padding: 10px; margin: 5px 0;">Success Color</div>
+            <div style="background: var(--warning-500); color: white; padding: 10px; margin: 5px 0;">Warning Color</div>
+            <div style="background: var(--danger-500); color: white; padding: 10px; margin: 5px 0;">Danger Color</div>
+        </div>
+
+        <div class="test-section">
+            <h2>Button Test</h2>
+            <button class="btn btn-primary" style="margin: 5px;">Primary Button</button>
+            <button class="btn btn-secondary" style="margin: 5px;">Secondary Button</button>
+            <button class="btn btn-success" style="margin: 5px;">Success Button</button>
+            <button class="btn btn-danger" style="margin: 5px;">Danger Button</button>
+        </div>
+
+        <div class="test-section">
+            <h2>Form Test</h2>
+            <div class="form-group">
+                <label for="test-input">Test Input</label>
+                <input type="text" id="test-input" placeholder="Test placeholder">
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>Card Test</h2>
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Test Card</h3>
+                    <span class="status-badge status-active">Active</span>
+                </div>
+                <p>This is a test card to verify the design system is working correctly.</p>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>Alert Test</h2>
+            <div class="alert alert-success">Success alert test</div>
+            <div class="alert alert-warning">Warning alert test</div>
+            <div class="alert alert-danger">Danger alert test</div>
+            <div class="alert alert-info">Info alert test</div>
+        </div>
+    </div>
+
+    <script>
+        // Test CSS custom properties
+        const testResults = [];
+        const rootStyles = getComputedStyle(document.documentElement);
+        
+        // Test primary color
+        const primaryColor = rootStyles.getPropertyValue('--primary-500').trim();
+        testResults.push({
+            test: 'Primary Color Variable',
+            result: primaryColor === '#2563eb',
+            value: primaryColor
+        });
+        
+        // Test spacing
+        const spacing4 = rootStyles.getPropertyValue('--spacing-4').trim();
+        testResults.push({
+            test: 'Spacing Variable',
+            result: spacing4 === '1rem',
+            value: spacing4
+        });
+        
+        // Display results
+        const resultsContainer = document.createElement('div');
+        resultsContainer.className = 'test-section';
+        resultsContainer.innerHTML = '<h2>CSS Variable Test Results</h2>';
+        
+        testResults.forEach(test => {
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result ${test.result ? 'success' : 'error'}`;
+            resultDiv.textContent = `${test.test}: ${test.result ? '✅ PASS' : '❌ FAIL'} (${test.value})`;
+            resultsContainer.appendChild(resultDiv);
+        });
+        
+        document.querySelector('.test-container').appendChild(resultsContainer);
+        
+        console.log('🎨 CSS Test Results:', testResults);
+    </script>
+</body>
+</html>

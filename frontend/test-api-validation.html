@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Mock Data Validation - Tourism Safety Tracker</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: #f8fafc;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .test-controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+        
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+        
+        .results-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        
+        .results-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .results-panel h3 {
+            margin-top: 0;
+            color: #1e293b;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 0.5rem;
+        }
+        
+        .console-output {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.875rem;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        
+        .test-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 1rem;
+            border-radius: 8px;
+            background: #f1f5f9;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #1e293b;
+        }
+        
+        .stat-label {
+            font-size: 0.875rem;
+            color: #64748b;
+            margin-top: 0.25rem;
+        }
+        
+        .test-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .test-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .test-item:last-child {
+            border-bottom: none;
+        }
+        
+        .test-status {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .status-passed {
+            background: #dcfce7;
+            color: #166534;
+        }
+        
+        .status-failed {
+            background: #fef2f2;
+            color: #991b1b;
+        }
+        
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        
+        .integration-docs {
+            grid-column: 1 / -1;
+            background: #eff6ff;
+            border: 1px solid #3b82f6;
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+        
+        .integration-docs h4 {
+            color: #1e40af;
+            margin-top: 0;
+        }
+        
+        .integration-docs ol {
+            color: #1e40af;
+        }
+        
+        @media (max-width: 768px) {
+            .results-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .test-controls {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🧪 API Mock Data Validation</h1>
+        <p>Testing all mock API responses and validating data integrity for Tourism Safety Tracker</p>
+    </div>
+    
+    <div class="test-controls">
+        <button id="run-tests" class="btn btn-primary">Run All Tests</button>
+        <button id="clear-results" class="btn btn-secondary">Clear Results</button>
+        <button id="test-individual" class="btn btn-secondary">Test Individual Components</button>
+    </div>
+    
+    <div class="results-container">
+        <div class="results-panel">
+            <h3>📊 Test Summary</h3>
+            <div class="test-summary">
+                <div class="stat-card">
+                    <div class="stat-value" id="total-tests">0</div>
+                    <div class="stat-label">Total Tests</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="passed-tests">0</div>
+                    <div class="stat-label">Passed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="failed-tests">0</div>
+                    <div class="stat-label">Failed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="success-rate">0%</div>
+                    <div class="stat-label">Success Rate</div>
+                </div>
+            </div>
+            
+            <h4>Test Results</h4>
+            <div id="test-results" class="test-list">
+                <p>Click "Run All Tests" to start validation</p>
+            </div>
+        </div>
+        
+        <div class="results-panel">
+            <h3>🖥️ Console Output</h3>
+            <div id="console-output" class="console-output">
+                Waiting for tests to run...
+            </div>
+        </div>
+        
+        <div class="integration-docs">
+            <h4>📋 API Integration Points for Sunday</h4>
+            <ol>
+                <li>Update <code>apiClient.baseURL</code> to real backend endpoint</li>
+                <li>Set <code>apiClient.useMockData = false</code></li>
+                <li>Verify authentication token format matches backend</li>
+                <li>Test error handling with real network conditions</li>
+                <li>Validate data formats match backend API contract</li>
+                <li>Test all CRUD operations with real data</li>
+                <li>Verify WebSocket connections for real-time features</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- Load the API client and validator -->
+    <script type="module">
+        import ApiValidator from './src/test/api-validation.js';
+        
+        let validator = null;
+        let isRunning = false;
+        
+        // Capture console output
+        const originalLog = console.log;
+        const consoleOutput = document.getElementById('console-output');
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            const message = args.join(' ');
+            consoleOutput.textContent += message + '\n';
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        };
+        
+        // Event listeners
+        document.getElementById('run-tests').addEventListener('click', async () => {
+            if (isRunning) return;
+            
+            isRunning = true;
+            const button = document.getElementById('run-tests');
+            button.textContent = 'Running Tests...';
+            button.classList.add('loading');
+            
+            // Clear previous results
+            consoleOutput.textContent = '';
+            document.getElementById('test-results').innerHTML = '<p>Running tests...</p>';
+            
+            try {
+                validator = new ApiValidator();
+                const results = await validator.runAllTests();
+                
+                // Update summary
+                updateTestSummary(results);
+                
+                // Update test list
+                updateTestList(validator.testResults);
+                
+            } catch (error) {
+                console.log('❌ Test execution failed:', error.message);
+            } finally {
+                isRunning = false;
+                button.textContent = 'Run All Tests';
+                button.classList.remove('loading');
+            }
+        });
+        
+        document.getElementById('clear-results').addEventListener('click', () => {
+            consoleOutput.textContent = 'Console cleared...';
+            document.getElementById('test-results').innerHTML = '<p>Click "Run All Tests" to start validation</p>';
+            updateTestSummary({ total: 0, passed: 0, failed: 0, successRate: 0 });
+        });
+        
+        document.getElementById('test-individual').addEventListener('click', () => {
+            showIndividualTestMenu();
+        });
+        
+        function updateTestSummary(results) {
+            document.getElementById('total-tests').textContent = results.total;
+            document.getElementById('passed-tests').textContent = results.passed;
+            document.getElementById('failed-tests').textContent = results.failed;
+            document.getElementById('success-rate').textContent = results.successRate + '%';
+        }
+        
+        function updateTestList(testResults) {
+            const container = document.getElementById('test-results');
+            
+            if (testResults.length === 0) {
+                container.innerHTML = '<p>No test results available</p>';
+                return;
+            }
+            
+            container.innerHTML = testResults.map(test => `
+                <div class="test-item">
+                    <span>${test.name}</span>
+                    <div>
+                        <span class="test-status status-${test.status.toLowerCase()}">${test.status}</span>
+                        ${test.duration > 0 ? `<small style="margin-left: 0.5rem; color: #64748b;">${test.duration}ms</small>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function showIndividualTestMenu() {
+            const tests = [
+                'Authentication Flow',
+                'Trip Management',
+                'Location Management', 
+                'Alert System',
+                'Error Scenarios'
+            ];
+            
+            const testMenu = tests.map((test, index) => 
+                `${index + 1}. ${test}`
+            ).join('\n');
+            
+            const choice = prompt(`Choose a test to run:\n\n${testMenu}\n\nEnter number (1-${tests.length}):`);
+            const testIndex = parseInt(choice) - 1;
+            
+            if (testIndex >= 0 && testIndex < tests.length) {
+                runIndividualTest(testIndex);
+            }
+        }
+        
+        async function runIndividualTest(testIndex) {
+            if (isRunning) return;
+            
+            isRunning = true;
+            consoleOutput.textContent = '';
+            
+            try {
+                validator = new ApiValidator();
+                
+                switch (testIndex) {
+                    case 0:
+                        await validator.testAuthenticationFlow();
+                        break;
+                    case 1:
+                        await validator.testTripManagement();
+                        break;
+                    case 2:
+                        await validator.testLocationManagement();
+                        break;
+                    case 3:
+                        await validator.testAlertSystem();
+                        break;
+                    case 4:
+                        await validator.testErrorScenarios();
+                        break;
+                }
+                
+                validator.generateReport();
+                updateTestList(validator.testResults);
+                
+            } catch (error) {
+                console.log('❌ Individual test failed:', error.message);
+            } finally {
+                isRunning = false;
+            }
+        }
+        
+        // Auto-run tests on page load for demo
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                console.log('🚀 API Validation Test Page Loaded');
+                console.log('Click "Run All Tests" to validate mock data integrity');
+            }, 500);
+        });
+    </script>
+</body>
+</html>

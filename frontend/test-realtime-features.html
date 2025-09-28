@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-time Features Test - Tourism Safety Tracker</title>
+    <link rel="stylesheet" href="src/styles/main.css">
+    <style>
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .test-section {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .test-section h2 {
+            color: #1e293b;
+            margin-bottom: 16px;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 8px;
+        }
+        
+        .test-controls {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        
+        .test-results {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+            font-family: monospace;
+            font-size: 14px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .status-connected {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status-disconnected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .status-connecting {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .log-entry {
+            margin-bottom: 8px;
+            padding: 8px;
+            border-left: 3px solid #e5e7eb;
+            background: white;
+        }
+        
+        .log-success {
+            border-left-color: #10b981;
+            background: #f0fdf4;
+        }
+        
+        .log-error {
+            border-left-color: #ef4444;
+            background: #fef2f2;
+        }
+        
+        .log-warning {
+            border-left-color: #f59e0b;
+            background: #fffbeb;
+        }
+        
+        .log-info {
+            border-left-color: #3b82f6;
+            background: #eff6ff;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+        
+        .metric-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+        }
+        
+        .metric-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1e293b;
+        }
+        
+        .metric-label {
+            font-size: 14px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+        
+        .notification-demo {
+            border: 2px dashed #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            color: #6b7280;
+        }
+        
+        .location-visualization {
+            height: 200px;
+            background: #f8fafc;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+            margin-top: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <header style="text-align: center; margin-bottom: 40px;">
+            <h1>🔄 Real-time Features Test Suite</h1>
+            <p>Testing WebSocket connections, polling systems, notifications, and live location sharing</p>
+        </header>
+
+        <!-- Connection Status Test -->
+        <div class="test-section">
+            <h2>🔌 Connection Status & Management</h2>
+            <div class="test-controls">
+                <button id="test-connection" class="btn btn-primary">Test Connection</button>
+                <button id="force-reconnect" class="btn btn-secondary">Force Reconnect</button>
+                <button id="simulate-disconnect" class="btn btn-warning">Simulate Disconnect</button>
+                <button id="toggle-websocket" class="btn btn-secondary">Toggle WebSocket/Polling</button>
+            </div>
+            
+            <div style="margin-bottom: 16px;">
+                <strong>Current Status:</strong>
+                <span id="connection-status" class="status-indicator status-connecting">
+                    🔄 Connecting...
+                </span>
+            </div>
+            
+            <div id="connection-info" class="test-results">
+                <div class="log-entry log-info">Initializing connection test...</div>
+            </div>
+        </div>
+
+        <!-- Polling System Test -->
+        <div class="test-section">
+            <h2>🔄 Polling System</h2>
+            <div class="test-controls">
+                <button id="start-polling" class="btn btn-success">Start Polling</button>
+                <button id="stop-polling" class="btn btn-danger">Stop Polling</button>
+                <button id="manual-poll" class="btn btn-primary">Manual Poll</button>
+                <button id="test-poll-failure" class="btn btn-warning">Test Poll Failure</button>
+            </div>
+            
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div id="poll-count" class="metric-value">0</div>
+                    <div class="metric-label">Total Polls</div>
+                </div>
+                <div class="metric-card">
+                    <div id="poll-success" class="metric-value">0</div>
+                    <div class="metric-label">Successful</div>
+                </div>
+                <div class="metric-card">
+                    <div id="poll-errors" class="metric-value">0</div>
+                    <div class="metric-label">Errors</div>
+                </div>
+                <div class="metric-card">
+                    <div id="avg-response-time" class="metric-value">0ms</div>
+                    <div class="metric-label">Avg Response</div>
+                </div>
+            </div>
+            
+            <div id="polling-log" class="test-results">
+                <div class="log-entry log-info">Polling system ready for testing...</div>
+            </div>
+        </div>
+
+        <!-- Alert Notifications Test -->
+        <div class="test-section">
+            <h2>🚨 Alert Notifications</h2>
+            <div class="test-controls">
+                <button id="test-low-alert" class="btn btn-info">Test Low Alert</button>
+                <button id="test-medium-alert" class="btn btn-warning">Test Medium Alert</button>
+                <button id="test-high-alert" class="btn btn-danger">Test High Alert</button>
+                <button id="test-critical-alert" class="btn btn-danger">Test Critical Alert</button>
+                <button id="request-notification-permission" class="btn btn-secondary">Request Notification Permission</button>
+            </div>
+            
+            <div class="notification-demo" id="notification-demo">
+                <p>🔔 Notifications will appear here and in your browser</p>
+                <small>Make sure to allow notifications when prompted</small>
+            </div>
+            
+            <div id="alert-log" class="test-results">
+                <div class="log-entry log-info">Alert notification system ready...</div>
+            </div>
+        </div>
+
+        <!-- Location Sharing Test -->
+        <div class="test-section">
+            <h2>📍 Live Location Sharing</h2>
+            <div class="test-controls">
+                <button id="start-location-sharing" class="btn btn-success">Start Location Sharing</button>
+                <button id="stop-location-sharing" class="btn btn-danger">Stop Location Sharing</button>
+                <button id="simulate-location-update" class="btn btn-primary">Simulate Location Update</button>
+                <button id="test-location-accuracy" class="btn btn-secondary">Test Location Accuracy</button>
+            </div>
+            
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div id="location-updates" class="metric-value">0</div>
+                    <div class="metric-label">Location Updates</div>
+                </div>
+                <div class="metric-card">
+                    <div id="current-accuracy" class="metric-value">N/A</div>
+                    <div class="metric-label">Current Accuracy</div>
+                </div>
+                <div class="metric-card">
+                    <div id="last-update-time" class="metric-value">Never</div>
+                    <div class="metric-label">Last Update</div>
+                </div>
+            </div>
+            
+            <div class="location-visualization" id="location-visualization">
+                📍 Location updates will be visualized here
+            </div>
+            
+            <div id="location-log" class="test-results">
+                <div class="log-entry log-info">Location sharing system ready...</div>
+            </div>
+        </div>
+
+        <!-- Performance Metrics -->
+        <div class="test-section">
+            <h2>📊 Performance Metrics</h2>
+            <div class="test-controls">
+                <button id="start-performance-test" class="btn btn-primary">Start Performance Test</button>
+                <button id="stress-test" class="btn btn-warning">Stress Test (100 operations)</button>
+                <button id="reset-metrics" class="btn btn-secondary">Reset Metrics</button>
+            </div>
+            
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div id="total-operations" class="metric-value">0</div>
+                    <div class="metric-label">Total Operations</div>
+                </div>
+                <div class="metric-card">
+                    <div id="operations-per-second" class="metric-value">0</div>
+                    <div class="metric-label">Operations/sec</div>
+                </div>
+                <div class="metric-card">
+                    <div id="memory-usage" class="metric-value">N/A</div>
+                    <div class="metric-label">Memory Usage</div>
+                </div>
+                <div class="metric-card">
+                    <div id="error-rate" class="metric-value">0%</div>
+                    <div class="metric-label">Error Rate</div>
+                </div>
+            </div>
+            
+            <div id="performance-log" class="test-results">
+                <div class="log-entry log-info">Performance monitoring ready...</div>
+            </div>
+        </div>
+
+        <!-- Integration Test -->
+        <div class="test-section">
+            <h2>🔗 Integration Test</h2>
+            <div class="test-controls">
+                <button id="run-integration-test" class="btn btn-success">Run Full Integration Test</button>
+                <button id="test-offline-mode" class="btn btn-warning">Test Offline Mode</button>
+                <button id="test-recovery" class="btn btn-info">Test Connection Recovery</button>
+            </div>
+            
+            <div id="integration-log" class="test-results">
+                <div class="log-entry log-info">Integration test suite ready...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import modules -->
+    <script type="module">
+        import realTimeService from './src/services/realtime.js';
+        import ConnectionStatusComponent from './src/components/connection-status.js';
+
+        // Test state
+        let testMetrics = {
+            pollCount: 0,
+            pollSuccess: 0,
+            pollErrors: 0,
+            responseTimes: [],
+            locationUpdates: 0,
+            totalOperations: 0,
+            startTime: Date.now()
+        };
+
+        // Initialize connection status component
+        const connectionStatus = new ConnectionStatusComponent();
+
+        // Utility functions
+        function log(message, type = 'info', containerId = 'connection-info') {
+            const container = document.getElementById(containerId);
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            entry.innerHTML = `<strong>${new Date().toLocaleTimeString()}</strong> - ${message}`;
+            container.appendChild(entry);
+            container.scrollTop = container.scrollHeight;
+            
+            // Keep only last 50 entries
+            while (container.children.length > 50) {
+                container.removeChild(container.firstChild);
+            }
+        }
+
+        function updateMetric(id, value) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.textContent = value;
+            }
+        }
+
+        function updateConnectionStatus(status, details = '') {
+            const statusEl = document.getElementById('connection-status');
+            statusEl.className = `status-indicator status-${status}`;
+            
+            const statusText = {
+                connected: '✅ Connected',
+                connecting: '🔄 Connecting',
+                disconnected: '❌ Disconnected',
+                error: '⚠️ Error'
+            };
+            
+            statusEl.innerHTML = `${statusText[status]} ${details}`;
+        }
+
+        // Connection Status Tests
+        document.getElementById('test-connection').addEventListener('click', async () => {
+            log('Testing connection...', 'info', 'connection-info');
+            updateConnectionStatus('connecting');
+            
+            try {
+                await realTimeService.pollForUpdates();
+                updateConnectionStatus('connected', '(Test successful)');
+                log('✅ Connection test successful', 'success', 'connection-info');
+            } catch (error) {
+                updateConnectionStatus('error', error.message);
+                log(`❌ Connection test failed: ${error.message}`, 'error', 'connection-info');
+            }
+        });
+
+        document.getElementById('force-reconnect').addEventListener('click', () => {
+            log('Forcing reconnection...', 'info', 'connection-info');
+            realTimeService.destroy();
+            setTimeout(() => {
+                realTimeService.init();
+                log('🔄 Reconnection initiated', 'info', 'connection-info');
+            }, 1000);
+        });
+
+        document.getElementById('simulate-disconnect').addEventListener('click', () => {
+            log('Simulating disconnect...', 'warning', 'connection-info');
+            updateConnectionStatus('disconnected', '(Simulated)');
+            realTimeService.updateConnectionStatus('disconnected', 'Simulated disconnect');
+        });
+
+        document.getElementById('toggle-websocket').addEventListener('click', () => {
+            const currentMode = realTimeService.config.useWebSocket ? 'WebSocket' : 'Polling';
+            realTimeService.config.useWebSocket = !realTimeService.config.useWebSocket;
+            const newMode = realTimeService.config.useWebSocket ? 'WebSocket' : 'Polling';
+            
+            log(`Switched from ${currentMode} to ${newMode}`, 'info', 'connection-info');
+            realTimeService.destroy();
+            setTimeout(() => realTimeService.init(), 500);
+        });
+
+        // Polling System Tests
+        document.getElementById('start-polling').addEventListener('click', () => {
+            log('Starting polling system...', 'info', 'polling-log');
+            realTimeService.startPolling();
+        });
+
+        document.getElementById('stop-polling').addEventListener('click', () => {
+            log('Stopping polling system...', 'warning', 'polling-log');
+            if (realTimeService.pollingInterval) {
+                clearInterval(realTimeService.pollingInterval);
+                realTimeService.pollingInterval = null;
+            }
+        });
+
+        document.getElementById('manual-poll').addEventListener('click', async () => {
+            const startTime = Date.now();
+            testMetrics.pollCount++;
+            updateMetric('poll-count', testMetrics.pollCount);
+            
+            log('Manual poll initiated...', 'info', 'polling-log');
+            
+            try {
+                await realTimeService.pollForUpdates();
+                const responseTime = Date.now() - startTime;
+                testMetrics.pollSuccess++;
+                testMetrics.responseTimes.push(responseTime);
+                
+                updateMetric('poll-success', testMetrics.pollSuccess);
+                const avgTime = testMetrics.responseTimes.reduce((a, b) => a + b, 0) / testMetrics.responseTimes.length;
+                updateMetric('avg-response-time', Math.round(avgTime) + 'ms');
+                
+                log(`✅ Poll successful (${responseTime}ms)`, 'success', 'polling-log');
+            } catch (error) {
+                testMetrics.pollErrors++;
+                updateMetric('poll-errors', testMetrics.pollErrors);
+                log(`❌ Poll failed: ${error.message}`, 'error', 'polling-log');
+            }
+        });
+
+        document.getElementById('test-poll-failure').addEventListener('click', () => {
+            log('Simulating poll failure...', 'warning', 'polling-log');
+            // Temporarily break the API to test error handling
+            const originalBaseURL = realTimeService.config.websocketUrl;
+            realTimeService.config.websocketUrl = 'ws://invalid-url:9999';
+            
+            setTimeout(() => {
+                realTimeService.config.websocketUrl = originalBaseURL;
+                log('Poll failure simulation ended', 'info', 'polling-log');
+            }, 5000);
+        });
+
+        // Alert Notification Tests
+        async function requestNotificationPermission() {
+            if ('Notification' in window) {
+                const permission = await Notification.requestPermission();
+                log(`Notification permission: ${permission}`, permission === 'granted' ? 'success' : 'warning', 'alert-log');
+                return permission === 'granted';
+            }
+            return false;
+        }
+
+        function showTestNotification(alert) {
+            const demo = document.getElementById('notification-demo');
+            demo.innerHTML = `
+                <div style="background: ${getSeverityColor(alert.severity)}; padding: 16px; border-radius: 8px; margin: 8px 0;">
+                    <strong>${alert.type.toUpperCase()}</strong><br>
+                    ${alert.message}<br>
+                    <small>Severity: ${alert.severity} | ${new Date().toLocaleTimeString()}</small>
+                </div>
+            `;
+            
+            log(`🚨 ${alert.severity.toUpperCase()} alert: ${alert.message}`, 'warning', 'alert-log');
+        }
+
+        function getSeverityColor(severity) {
+            const colors = {
+                low: '#dbeafe',
+                medium: '#fef3c7', 
+                high: '#fed7aa',
+                critical: '#fee2e2'
+            };
+            return colors[severity] || '#f3f4f6';
+        }
+
+        document.getElementById('request-notification-permission').addEventListener('click', requestNotificationPermission);
+
+        document.getElementById('test-low-alert').addEventListener('click', () => {
+            const alert = {
+                type: 'check_in',
+                message: 'Regular safety check-in reminder',
+                severity: 'low'
+            };
+            realTimeService.simulateAlert(alert);
+            showTestNotification(alert);
+        });
+
+        document.getElementById('test-medium-alert').addEventListener('click', () => {
+            const alert = {
+                type: 'location_deviation',
+                message: 'You appear to be off your planned route',
+                severity: 'medium'
+            };
+            realTimeService.simulateAlert(alert);
+            showTestNotification(alert);
+        });
+
+        document.getElementById('test-high-alert').addEventListener('click', () => {
+            const alert = {
+                type: 'battery_low',
+                message: 'Device battery is critically low (5%)',
+                severity: 'high'
+            };
+            realTimeService.simulateAlert(alert);
+            showTestNotification(alert);
+        });
+
+        document.getElementById('test-critical-alert').addEventListener('click', () => {
+            const alert = {
+                type: 'emergency',
+                message: 'Emergency alert - immediate response required',
+                severity: 'critical'
+            };
+            realTimeService.simulateAlert(alert);
+            showTestNotification(alert);
+        });
+
+        // Location Sharing Tests
+        document.getElementById('start-location-sharing').addEventListener('click', () => {
+            log('Starting location sharing...', 'info', 'location-log');
+            realTimeService.startLocationSharing('test-trip-123');
+        });
+
+        document.getElementById('stop-location-sharing').addEventListener('click', () => {
+            log('Stopping location sharing...', 'warning', 'location-log');
+            realTimeService.stopLocationSharing();
+        });
+
+        document.getElementById('simulate-location-update').addEventListener('click', () => {
+            const locations = [
+                { lat: 35.6762, lng: 139.6503, name: 'Tokyo Station' },
+                { lat: 35.6598, lng: 139.7006, name: 'Shibuya' },
+                { lat: 35.7148, lng: 139.7967, name: 'Asakusa' },
+                { lat: 35.6654, lng: 139.7707, name: 'Tsukiji' }
+            ];
+            
+            const randomLocation = locations[Math.floor(Math.random() * locations.length)];
+            const locationUpdate = {
+                ...randomLocation,
+                accuracy: Math.floor(Math.random() * 20) + 5,
+                timestamp: new Date().toISOString()
+            };
+            
+            testMetrics.locationUpdates++;
+            updateMetric('location-updates', testMetrics.locationUpdates);
+            updateMetric('current-accuracy', locationUpdate.accuracy + 'm');
+            updateMetric('last-update-time', new Date().toLocaleTimeString());
+            
+            // Update visualization
+            const viz = document.getElementById('location-visualization');
+            viz.innerHTML = `
+                <div style="text-align: center;">
+                    <div style="font-size: 24px; margin-bottom: 8px;">📍</div>
+                    <div><strong>${randomLocation.name}</strong></div>
+                    <div>Lat: ${randomLocation.lat.toFixed(4)}, Lng: ${randomLocation.lng.toFixed(4)}</div>
+                    <div>Accuracy: ±${locationUpdate.accuracy}m</div>
+                    <div style="font-size: 12px; color: #6b7280; margin-top: 8px;">
+                        Updated: ${new Date().toLocaleTimeString()}
+                    </div>
+                </div>
+            `;
+            
+            realTimeService.simulateLocationUpdate(locationUpdate);
+            log(`📍 Location updated: ${randomLocation.name} (±${locationUpdate.accuracy}m)`, 'success', 'location-log');
+        });
+
+        document.getElementById('test-location-accuracy').addEventListener('click', () => {
+            if ('geolocation' in navigator) {
+                log('Testing GPS accuracy...', 'info', 'location-log');
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const accuracy = position.coords.accuracy;
+                        updateMetric('current-accuracy', accuracy + 'm');
+                        log(`📍 GPS accuracy: ±${accuracy}m`, accuracy < 20 ? 'success' : 'warning', 'location-log');
+                    },
+                    (error) => {
+                        log(`❌ GPS error: ${error.message}`, 'error', 'location-log');
+                    },
+                    { enableHighAccuracy: true, timeout: 10000 }
+                );
+            } else {
+                log('❌ Geolocation not supported', 'error', 'location-log');
+            }
+        });
+
+        // Performance Tests
+        document.getElementById('start-performance-test').addEventListener('click', async () => {
+            log('Starting performance test...', 'info', 'performance-log');
+            const startTime = Date.now();
+            let operations = 0;
+            
+            const performanceInterval = setInterval(async () => {
+                try {
+                    await realTimeService.pollForUpdates();
+                    operations++;
+                    testMetrics.totalOperations++;
+                    
+                    const elapsed = (Date.now() - startTime) / 1000;
+                    const opsPerSecond = Math.round(operations / elapsed);
+                    
+                    updateMetric('total-operations', testMetrics.totalOperations);
+                    updateMetric('operations-per-second', opsPerSecond);
+                    
+                    if (performance.memory) {
+                        const memoryMB = Math.round(performance.memory.usedJSHeapSize / 1024 / 1024);
+                        updateMetric('memory-usage', memoryMB + 'MB');
+                    }
+                    
+                } catch (error) {
+                    log(`Performance test error: ${error.message}`, 'error', 'performance-log');
+                }
+            }, 1000);
+            
+            // Stop after 30 seconds
+            setTimeout(() => {
+                clearInterval(performanceInterval);
+                log('Performance test completed', 'success', 'performance-log');
+            }, 30000);
+        });
+
+        document.getElementById('stress-test').addEventListener('click', async () => {
+            log('Starting stress test (100 operations)...', 'warning', 'performance-log');
+            const startTime = Date.now();
+            let completed = 0;
+            let errors = 0;
+            
+            const promises = Array.from({ length: 100 }, async (_, i) => {
+                try {
+                    await realTimeService.pollForUpdates();
+                    completed++;
+                } catch (error) {
+                    errors++;
+                }
+            });
+            
+            await Promise.allSettled(promises);
+            
+            const duration = Date.now() - startTime;
+            const errorRate = Math.round((errors / 100) * 100);
+            
+            updateMetric('error-rate', errorRate + '%');
+            log(`Stress test completed: ${completed}/100 successful in ${duration}ms`, 'success', 'performance-log');
+        });
+
+        document.getElementById('reset-metrics').addEventListener('click', () => {
+            testMetrics = {
+                pollCount: 0,
+                pollSuccess: 0,
+                pollErrors: 0,
+                responseTimes: [],
+                locationUpdates: 0,
+                totalOperations: 0,
+                startTime: Date.now()
+            };
+            
+            updateMetric('poll-count', 0);
+            updateMetric('poll-success', 0);
+            updateMetric('poll-errors', 0);
+            updateMetric('avg-response-time', '0ms');
+            updateMetric('location-updates', 0);
+            updateMetric('current-accuracy', 'N/A');
+            updateMetric('last-update-time', 'Never');
+            updateMetric('total-operations', 0);
+            updateMetric('operations-per-second', 0);
+            updateMetric('memory-usage', 'N/A');
+            updateMetric('error-rate', '0%');
+            
+            log('Metrics reset', 'info', 'performance-log');
+        });
+
+        // Integration Tests
+        document.getElementById('run-integration-test').addEventListener('click', async () => {
+            log('🚀 Starting full integration test...', 'info', 'integration-log');
+            
+            const tests = [
+                { name: 'Connection Test', fn: () => realTimeService.pollForUpdates() },
+                { name: 'Alert Simulation', fn: () => realTimeService.simulateAlert({ type: 'test', message: 'Integration test alert', severity: 'low' }) },
+                { name: 'Location Update', fn: () => realTimeService.simulateLocationUpdate({ lat: 35.6762, lng: 139.6503 }) },
+                { name: 'Notification Permission', fn: requestNotificationPermission }
+            ];
+            
+            for (const test of tests) {
+                try {
+                    log(`Running ${test.name}...`, 'info', 'integration-log');
+                    await test.fn();
+                    log(`✅ ${test.name} passed`, 'success', 'integration-log');
+                } catch (error) {
+                    log(`❌ ${test.name} failed: ${error.message}`, 'error', 'integration-log');
+                }
+                
+                // Wait between tests
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+            
+            log('🎉 Integration test completed', 'success', 'integration-log');
+        });
+
+        document.getElementById('test-offline-mode').addEventListener('click', () => {
+            log('Testing offline mode...', 'warning', 'integration-log');
+            
+            // Simulate offline
+            Object.defineProperty(navigator, 'onLine', {
+                writable: true,
+                value: false
+            });
+            
+            window.dispatchEvent(new Event('offline'));
+            log('📴 Offline mode activated', 'warning', 'integration-log');
+            
+            setTimeout(() => {
+                Object.defineProperty(navigator, 'onLine', {
+                    writable: true,
+                    value: true
+                });
+                window.dispatchEvent(new Event('online'));
+                log('📶 Online mode restored', 'success', 'integration-log');
+            }, 5000);
+        });
+
+        document.getElementById('test-recovery').addEventListener('click', () => {
+            log('Testing connection recovery...', 'info', 'integration-log');
+            
+            // Simulate connection loss and recovery
+            realTimeService.updateConnectionStatus('error', 'Connection lost');
+            log('❌ Connection lost (simulated)', 'error', 'integration-log');
+            
+            setTimeout(() => {
+                realTimeService.updateConnectionStatus('connecting');
+                log('🔄 Attempting recovery...', 'info', 'integration-log');
+                
+                setTimeout(() => {
+                    realTimeService.updateConnectionStatus('connected');
+                    log('✅ Connection recovered', 'success', 'integration-log');
+                }, 2000);
+            }, 3000);
+        });
+
+        // Subscribe to real-time service events
+        realTimeService.onConnectionStatusChange((status) => {
+            updateConnectionStatus(status.status, status.lastError ? `(${status.lastError})` : '');
+            log(`Connection status changed: ${status.status}`, 'info', 'connection-info');
+        });
+
+        realTimeService.onAlertUpdate((alert) => {
+            log(`🚨 Real-time alert received: ${alert.message}`, 'warning', 'alert-log');
+        });
+
+        realTimeService.onLocationUpdate((location) => {
+            log(`📍 Real-time location update: ${location.lat}, ${location.lng}`, 'info', 'location-log');
+        });
+
+        // Initialize
+        log('🔄 Real-time features test suite initialized', 'success', 'connection-info');
+        log('📊 Performance monitoring ready', 'success', 'performance-log');
+        log('🚨 Alert system ready for testing', 'success', 'alert-log');
+        log('📍 Location services ready', 'success', 'location-log');
+        log('🔗 Integration tests ready', 'success', 'integration-log');
+    </script>
+</body>
+</html>
